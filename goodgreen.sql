@@ -46,25 +46,29 @@ CREATE TABLE contact_info (
     PRIMARY KEY (contact_info_id),
 );
 
--- create a parent_company table
-DROP TABLE IF EXISTS parent_companies;
-CREATE TABLE parent_companies (
-    parent_company_id INT NOT NULL IDENTITY(1,1),
+-- create a producer_parent table with contact_info
+DROP TABLE IF EXISTS producer_parents;
+CREATE TABLE producer_parents (
+    producer_parent_id INT NOT NULL IDENTITY(1,1),
+    contact_info_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (parent_company_id)
+    PRIMARY KEY (producer_parent_id),
+    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id)
 );
 
--- create a producer table with contact_info
+
+-- create a producer table with contact_info and producer_parents
 DROP TABLE IF EXISTS producers;
 CREATE TABLE producers (
     producer_id INT NOT NULL IDENTITY(1,1),
-    parent_company_id INT NOT NULL,
     contact_info_id INT NOT NULL,
+    producer_parent_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (producer_id),
-    FOREIGN KEY (parent_company_id) REFERENCES parent_companies(parent_company_id),
-    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id)
+    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id),
+    FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id)
 );
+
 
 -- producers_have_locations table
 DROP TABLE IF EXISTS producers_have_locations;
@@ -74,5 +78,61 @@ CREATE TABLE producers_have_locations (
     PRIMARY KEY (producer_id, location_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
+);
+
+-- empresas regionales (grandes) y locales (pequeñas)
+-- company table (no parent company, local or regional)
+DROP TABLE IF EXISTS companies;
+CREATE TABLE companies (
+    company_id INT NOT NULL IDENTITY(1,1),
+    contact_info_id INT NOT NULL,
+    is_local BIT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (company_id),
+    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id)
+);
+
+-- companies have locations table
+DROP TABLE IF EXISTS companies_have_locations;
+CREATE TABLE companies_have_locations (
+    company_id INT NOT NULL,
+    location_id INT NOT NULL,
+    PRIMARY KEY (company_id, location_id),
+    FOREIGN KEY (company_id) REFERENCES companies(company_id),
+    FOREIGN KEY (location_id) REFERENCES locations(location_id)
+);
+
+-- fleets table with company
+DROP TABLE IF EXISTS fleets;
+CREATE TABLE fleets (
+    fleet_id INT NOT NULL IDENTITY(1,1),
+    company_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (fleet_id),
+    FOREIGN KEY (company_id) REFERENCES companies(company_id)
+);
+
+-- collection_points table with location and name
+DROP TABLE IF EXISTS collection_points;
+CREATE TABLE collection_points (
+    collection_point_id INT NOT NULL IDENTITY(1,1),
+    location_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (collection_point_id),
+    FOREIGN KEY (location_id) REFERENCES locations(location_id)
+);
+
+-- collection_log table with collection_point and fleet or producer, and datetime
+DROP TABLE IF EXISTS collection_log;
+CREATE TABLE collection_log (
+    collection_log_id INT NOT NULL IDENTITY(1,1),
+    collection_point_id INT NOT NULL,
+    fleet_id INT NULL,
+    producer_id INT NULL,
+    datetime DATETIME NOT NULL,
+    PRIMARY KEY (collection_log_id),
+    FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
+    FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
 );
 
