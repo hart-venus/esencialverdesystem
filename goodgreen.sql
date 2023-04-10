@@ -138,6 +138,7 @@ DROP TABLE IF EXISTS collection_log;
 CREATE TABLE collection_log (
     collection_log_id INT NOT NULL IDENTITY(1,1),
     collection_point_id INT NOT NULL,
+    which_party tinyint(2) NOT NULL, -- 0: company, 1: producer, 2: fleet
     fleet_id INT NULL,
     company_id INT NULL,
     producer_id INT NULL,
@@ -154,6 +155,7 @@ DROP TABLE IF EXISTS trash_types;
 CREATE TABLE trash_types (
     trash_type_id INT NOT NULL IDENTITY(1,1),
     name VARCHAR(255) NOT NULL,
+    is_recyclable BIT NOT NULL,
     PRIMARY KEY (trash_type_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
@@ -180,6 +182,41 @@ CREATE TABLE recipient_types_have_trash_types (
     FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
 );
 
+-- contract table
+DROP TABLE IF EXISTS contracts;
+CREATE TABLE contracts (
+    contract_id INT NOT NULL IDENTITY(1,1),
+    PRIMARY KEY (contract_id)
+);
+
+-- percentages table
+DROP TABLE IF EXISTS percentages;
+CREATE TABLE percentages (
+    percentage_id INT NOT NULL IDENTITY(1,1),
+    which_party tinyint(2) NOT NULL, -- 0: company, 1: producer, 2: fleet
+    fleet_id INT NULL,
+    company_id INT NULL,
+    producer_id INT NULL,
+    percentage FLOAT NOT NULL,
+    contract_id INT NOT NULL,
+    PRIMARY KEY (percentage_id),
+    FOREIGN KEY (contract_id) REFERENCES contracts(contract_id)
+);
+
+-- product that ends up being produced
+DROP TABLE IF EXISTS products;
+CREATE TABLE products (
+    product_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10,3) NOT NULL,
+    contract_id INT NOT NULL,
+    kg_to_produce FLOAT NOT NULL,
+    PRIMARY KEY (product_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (contract_id) REFERENCES contracts(contract_id)
+);
+
 -- recipient with type
 DROP TABLE IF EXISTS recipients;
 CREATE TABLE recipients (
@@ -204,3 +241,29 @@ CREATE TABLE recipient_log (
     FOREIGN KEY (recipient_id) REFERENCES recipients(recipient_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
 );
+
+-- processing table with a price per kg, a name
+-- and trash types
+DROP TABLE IF EXISTS processing;
+CREATE TABLE processing (
+    processing_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    location_id INT NOT NULL,
+    PRIMARY KEY (processing_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (location_id) REFERENCES locations(location_id)
+);
+
+-- processing_have_trash_types table
+DROP TABLE IF EXISTS processing_have_trash_types;
+CREATE TABLE processing_have_trash_types (
+    processing_id INT NOT NULL,
+    trash_type_id INT NOT NULL,
+    price_per_kg FLOAT NOT NULL,
+    kgs_recycled FLOAT NOT NULL,
+    PRIMARY KEY (processing_id, trash_type_id),
+    FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
+);
+
