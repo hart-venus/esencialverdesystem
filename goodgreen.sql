@@ -44,6 +44,8 @@ CREATE TABLE contact_info (
     phone VARCHAR(50) NOT NULL,
     email VARCHAR(255) NOT NULL,
     PRIMARY KEY (contact_info_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
 
 -- create a producer_parent table with contact_info
@@ -66,7 +68,9 @@ CREATE TABLE producers (
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (producer_id),
     FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id),
-    FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id)
+    FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
 
 
@@ -82,6 +86,7 @@ CREATE TABLE producers_have_locations (
 
 -- empresas regionales (grandes) y locales (pequeñas)
 -- company table (no parent company, local or regional)
+-- pueden ser esencial verde, o una empresa que recolecta
 DROP TABLE IF EXISTS companies;
 CREATE TABLE companies (
     company_id INT NOT NULL IDENTITY(1,1),
@@ -89,7 +94,9 @@ CREATE TABLE companies (
     is_local BIT NOT NULL,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (company_id),
-    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id)
+    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
 
 -- companies have locations table
@@ -99,17 +106,19 @@ CREATE TABLE companies_have_locations (
     location_id INT NOT NULL,
     PRIMARY KEY (company_id, location_id),
     FOREIGN KEY (company_id) REFERENCES companies(company_id),
-    FOREIGN KEY (location_id) REFERENCES locations(location_id)
+    FOREIGN KEY (location_id) REFERENCES locations(location_id),
+
 );
 
 -- fleets table with company
 DROP TABLE IF EXISTS fleets;
 CREATE TABLE fleets (
     fleet_id INT NOT NULL IDENTITY(1,1),
-    company_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (fleet_id),
-    FOREIGN KEY (company_id) REFERENCES companies(company_id)
+    FOREIGN KEY (company_id) REFERENCES companies(company_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
 
 -- collection_points table with location and name
@@ -119,20 +128,79 @@ CREATE TABLE collection_points (
     location_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (collection_point_id),
-    FOREIGN KEY (location_id) REFERENCES locations(location_id)
+    FOREIGN KEY (location_id) REFERENCES locations(location_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
 
--- collection_log table with collection_point and fleet or producer, and datetime
+-- collection_log table with collection_point and fleet, company or producer, and datetime
 DROP TABLE IF EXISTS collection_log;
 CREATE TABLE collection_log (
     collection_log_id INT NOT NULL IDENTITY(1,1),
     collection_point_id INT NOT NULL,
     fleet_id INT NULL,
+    company_id INT NULL,
     producer_id INT NULL,
     datetime DATETIME NOT NULL,
     PRIMARY KEY (collection_log_id),
     FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
     FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
-    FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
+    FOREIGN KEY (company_id) REFERENCES companies(company_id)
 );
 
+-- trash types table
+DROP TABLE IF EXISTS trash_types;
+CREATE TABLE trash_types (
+    trash_type_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (trash_type_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
+);
+
+-- recipient types table
+DROP TABLE IF EXISTS recipient_types;
+CREATE TABLE recipient_types (
+    recipient_type_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    weight_capacity FLOAT NOT NULL,
+    PRIMARY KEY (recipient_type_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
+);
+
+-- recipient_types_have_trash_types table
+DROP TABLE IF EXISTS recipient_types_have_trash_types;
+CREATE TABLE recipient_types_have_trash_types (
+    recipient_type_id INT NOT NULL,
+    trash_type_id INT NOT NULL,
+    PRIMARY KEY (recipient_type_id, trash_type_id),
+    FOREIGN KEY (recipient_type_id) REFERENCES recipient_types(recipient_type_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
+);
+
+-- recipient with type
+DROP TABLE IF EXISTS recipients;
+CREATE TABLE recipients (
+    recipient_id INT NOT NULL IDENTITY(1,1),
+    recipient_type_id INT NOT NULL,
+    producer_id INT NOT NULL,
+    PRIMARY KEY (recipient_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
+    FOREIGN KEY (recipient_type_id) REFERENCES recipient_types(recipient_type_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
+);
+-- recipient log with datetime, recipient, location, and weight
+DROP TABLE IF EXISTS recipient_log;
+CREATE TABLE recipient_log (
+    recipient_log_id INT NOT NULL IDENTITY(1,1),
+    recipient_id INT NOT NULL,
+    location_id INT NOT NULL,
+    datetime DATETIME NOT NULL,
+    weight FLOAT NOT NULL,
+    PRIMARY KEY (recipient_log_id),
+    FOREIGN KEY (recipient_id) REFERENCES recipients(recipient_id),
+    FOREIGN KEY (location_id) REFERENCES locations(location_id)
+);
