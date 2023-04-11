@@ -252,7 +252,6 @@ CREATE TABLE schedule_log (
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id)
 );
 
-
 -- trash types table
 DROP TABLE IF EXISTS trash_types;
 CREATE TABLE trash_types (
@@ -371,11 +370,6 @@ CREATE TABLE recipient_log (
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
 );
 
-
-
-
-
-
 -- table for languages
 DROP TABLE IF EXISTS languages;
 CREATE TABLE languages (
@@ -403,36 +397,36 @@ CREATE TABLE settings_have_languages (
     FOREIGN KEY (language_id) REFERENCES languages(language_id)
 );
 
--- table for billing a producer_parent
+-- table for billing a producer
 DROP TABLE IF EXISTS billing;
 CREATE TABLE billing (
     billing_id INT NOT NULL IDENTITY(1,1),
     service_contract_id INT NOT NULL,
-    producer_parent_id INT NOT NULL,
+    producer_id INT NOT NULL,
     amount DECIMAL(10,3) NOT NULL,
     currency_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     hash varbinary(64) NOT NULL,
     PRIMARY KEY (billing_id),
-    FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
 
--- table that lets especially contaminant producer_parents pay
--- for other producer_parents' bills
+-- table that lets especially contaminant producers pay
+-- for other producers' bills
 DROP TABLE IF EXISTS billing_payments;
 CREATE TABLE billing_payments (
     billing_payment_id INT NOT NULL IDENTITY(1,1),
     billing_id INT NOT NULL,
-    producer_parent_id INT NOT NULL,
+    producer_id INT NOT NULL,
     amount DECIMAL(10,3) NOT NULL,
     service_contract_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     hash varbinary(64) NOT NULL,
     PRIMARY KEY (billing_payment_id),
     FOREIGN KEY (billing_id) REFERENCES billing(billing_id),
-    FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id)
 );
 -- schedule_logs_have_recipients with expected amount of trash
@@ -447,19 +441,16 @@ CREATE TABLE schedule_logs_have_recipients (
     FOREIGN KEY (recipient_id) REFERENCES recipients(recipient_id)
 );
 
--- carbon_footprint_score per producer_parent and datetime
+-- carbon_footprint_score per producer and datetime
 DROP TABLE IF EXISTS carbon_footprint_score;
 CREATE TABLE carbon_footprint_score (
     carbon_footprint_score_id INT NOT NULL IDENTITY(1,1),
-    producer_parent_id INT NOT NULL,
+    producer_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     score FLOAT NOT NULL,
     PRIMARY KEY (carbon_footprint_score_id),
-    FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id)
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
 );
-
-
-
 
 -- certificates have trash types table
 DROP TABLE IF EXISTS certificates_have_trash_types;
@@ -484,8 +475,6 @@ CREATE TABLE processing (
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
-
-
 
 -- processing_have_trash_types table
 DROP TABLE IF EXISTS processing_have_trash_types;
