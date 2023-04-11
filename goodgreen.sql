@@ -362,6 +362,7 @@ CREATE TABLE recipient_log (
     recipient_id INT NOT NULL,
     collection_log INT NULL,
     action tinyint NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: check cleaning
+    cleanliness BIT NOT NULL, -- 0: dirty, 1: clean
     location_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     weight FLOAT NOT NULL,
