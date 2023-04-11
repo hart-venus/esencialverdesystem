@@ -481,19 +481,10 @@ CREATE TABLE processing (
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
-    FOREIGN KEY (product_id) REFERENCES products(product_id),
-    FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
--- processings_have_recycling_contracts table
-DROP TABLE IF EXISTS processings_have_recycling_contracts;
-CREATE TABLE processings_have_recycling_contracts (
-    processing_id INT NOT NULL,
-    recycling_contract_id INT NOT NULL,
-    PRIMARY KEY (processing_id, recycling_contract_id),
-    FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
-    FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
-);
+
 
 -- processing_have_trash_types table
 DROP TABLE IF EXISTS processing_have_trash_types;
@@ -524,4 +515,13 @@ CREATE TABLE processing_have_trash_types_price_per_kg_log (
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
+);
+-- processings_have_recycling_contracts table
+DROP TABLE IF EXISTS processings_have_recycling_contracts;
+CREATE TABLE processings_have_recycling_contracts (
+    processing_id INT NOT NULL,
+    recycling_contract_id INT NOT NULL,
+    PRIMARY KEY (processing_id, recycling_contract_id),
+    FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
+    FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
 );
