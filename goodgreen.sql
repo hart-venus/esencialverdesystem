@@ -485,7 +485,7 @@ CREATE TABLE processing (
     FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
 );
 
-processings_have_recycling_contracts table
+-- processings_have_recycling_contracts table
 DROP TABLE IF EXISTS processings_have_recycling_contracts;
 CREATE TABLE processings_have_recycling_contracts (
     processing_id INT NOT NULL,
