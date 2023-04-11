@@ -478,13 +478,23 @@ CREATE TABLE processing (
     location_id INT NOT NULL, -- processing location, different locations have different processing units
     PRIMARY KEY (processing_id),
     product_id INT NOT NULL, -- product that is produced, different processing units produce different products
-    recycling_contract_id INT NOT NULL, -- contract that is used for this processing unit
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id),
     FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
 );
+
+processings_have_recycling_contracts table
+DROP TABLE IF EXISTS processings_have_recycling_contracts;
+CREATE TABLE processings_have_recycling_contracts (
+    processing_id INT NOT NULL,
+    recycling_contract_id INT NOT NULL,
+    PRIMARY KEY (processing_id, recycling_contract_id),
+    FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
+    FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
+);
+
 -- processing_have_trash_types table
 DROP TABLE IF EXISTS processing_have_trash_types;
 CREATE TABLE processing_have_trash_types (
