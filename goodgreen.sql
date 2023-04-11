@@ -174,7 +174,7 @@ CREATE TABLE collection_log (
     which_party tinyint(2) NOT NULL, -- 0: company, 1: producer, 2: fleet
     fleet_id INT NULL,
     company_id INT NULL,
-    action tinyint(1) NOT NULL, -- 0: pickup, 1: dropoff
+    action tinyint(2) NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: checkup
     producer_id INT NULL,
     datetime DATETIME NOT NULL,
     PRIMARY KEY (collection_log_id),
