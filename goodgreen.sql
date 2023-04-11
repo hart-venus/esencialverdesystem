@@ -14,7 +14,7 @@ CREATE TABLE currencies_dollar_exchange_rate_log (
     exchange_rate DECIMAL(10,3) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     active BIT NOT NULL DEFAULT 1,
-    hash varbinary(64) NOT NULL DEFAULT HASHBYTES('SHA2_256', NEWID()),
+    hash varbinary(64) NOT NULL,
     PRIMARY KEY (currency_dollar_exchange_rate_log_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
@@ -78,7 +78,7 @@ CREATE TABLE contact_info (
     PRIMARY KEY (contact_info_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    hash varbinary(64) NOT NULL DEFAULT HASHBYTES('SHA2_256', NEWID())
+    hash varbinary(64) NOT NULL
 );
 
 -- create a producer_parent table with contact_info
@@ -139,7 +139,6 @@ CREATE TABLE fleets (
     fleet_id INT NOT NULL IDENTITY(1,1),
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (fleet_id),
-    FOREIGN KEY (company_id) REFERENCES companies(company_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     capacity DECIMAL(10,3) NOT NULL,
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
@@ -171,10 +170,10 @@ DROP TABLE IF EXISTS collection_log;
 CREATE TABLE collection_log (
     collection_log_id INT NOT NULL IDENTITY(1,1),
     collection_point_id INT NOT NULL,
-    which_party tinyint(2) NOT NULL, -- 0: company, 1: producer, 2: fleet
+    which_party tinyint NOT NULL, -- 0: company, 1: producer, 2: fleet
     fleet_id INT NULL,
     company_id INT NULL,
-    action tinyint(2) NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: checkup
+    action tinyint NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: checkup
     producer_id INT NULL,
     datetime DATETIME NOT NULL,
     PRIMARY KEY (collection_log_id),
@@ -218,15 +217,7 @@ CREATE TABLE certificates (
     PRIMARY KEY (certificate_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
 );
--- certificates have trash types table
-DROP TABLE IF EXISTS certificates_have_trash_types;
-CREATE TABLE certificates_have_trash_types (
-    certificate_id INT NOT NULL,
-    trash_type_id INT NOT NULL,
-    PRIMARY KEY (certificate_id, trash_type_id),
-    FOREIGN KEY (certificate_id) REFERENCES certificates(certificate_id),
-    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
-);
+
 
 -- contracts have certificates table
 DROP TABLE IF EXISTS contracts_have_certificates;
@@ -242,7 +233,7 @@ CREATE TABLE contracts_have_certificates (
 DROP TABLE IF EXISTS schedule_log;
 CREATE TABLE schedule_log (
     schedule_log_id INT NOT NULL IDENTITY(1,1),
-    which_party tinyint(2) NOT NULL, -- 0: company, 1: producer, 2: fleet
+    which_party tinyint NOT NULL, -- 0: company, 1: producer, 2: fleet
     fleet_id INT NULL,
     company_id INT NULL,
     producer_id INT NULL,
@@ -250,7 +241,7 @@ CREATE TABLE schedule_log (
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     service_contract_id INT NOT NULL,
-    action tinyint(2) NOT NULL -- 0: pickup, 1: dropoff, 2: cleaning, 3: checkup
+    action tinyint NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: checkup
     frequency VARCHAR(255) NOT NULL,
     active BIT NOT NULL DEFAULT 1,
     PRIMARY KEY (schedule_log_id),
@@ -296,13 +287,13 @@ CREATE TABLE recipient_types_have_trash_types (
 
 -- contract table
 DROP TABLE IF EXISTS recycling_contracts;
-CREATE TABLE contracts (
+CREATE TABLE recycling_contracts (
     recycling_contract_id INT NOT NULL IDENTITY(1,1),
-    hash varbinary(64) NOT NULL DEFAULT HASHBYTES('SHA2_256', NEWID()),
+    hash varbinary(64) NOT NULL,
     valid_from DATETIME NOT NULL,
     valid_to DATETIME NOT NULL,
     service_contract_id INT NOT NULL,
-    PRIMARY KEY (contract_id),
+    PRIMARY KEY (recycling_contract_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id)
 );
 
@@ -310,7 +301,7 @@ CREATE TABLE contracts (
 DROP TABLE IF EXISTS percentages;
 CREATE TABLE percentages (
     percentage_id INT NOT NULL IDENTITY(1,1),
-    which_party tinyint(2) NOT NULL, -- 0: company, 1: producer, 2: fleet, 3: other
+    which_party tinyint NOT NULL, -- 0: company, 1: producer, 2: fleet, 3: other
     fleet_id INT NULL,
     company_id INT NULL,
     producer_id INT NULL,
@@ -318,7 +309,7 @@ CREATE TABLE percentages (
     percentage FLOAT NOT NULL,
     recycling_contract_id INT NOT NULL,
     PRIMARY KEY (percentage_id),
-    FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recyling_contract_id)
+    FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
 );
 
 -- product that ends up being produced
@@ -343,7 +334,7 @@ CREATE TABLE product_price_per_location_log (
     price FLOAT NOT NULL,
     datetime DATETIME NOT NULL,
     active BIT NOT NULL DEFAULT 1,
-    hash varbinary(64) NOT NULL DEFAULT HASHBYTES('SHA2_256', NEWID()),
+    hash varbinary(64) NOT NULL,
     PRIMARY KEY (product_price_per_location_log_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
@@ -357,7 +348,7 @@ CREATE TABLE recipients (
     recipient_id INT NOT NULL IDENTITY(1,1),
     recipient_type_id INT NOT NULL,
     producer_id INT NOT NULL,
-    cleanliness tinyint(1) NOT NULL, -- 0: dirty, 1: clean
+    cleanliness BIT NOT NULL, -- 0: dirty, 1: clean
     PRIMARY KEY (recipient_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (recipient_type_id) REFERENCES recipient_types(recipient_type_id),
@@ -370,7 +361,7 @@ CREATE TABLE recipient_log (
     recipient_log_id INT NOT NULL IDENTITY(1,1),
     recipient_id INT NOT NULL,
     collection_log INT NULL,
-    action tinyint(2) NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: check cleaning
+    action tinyint NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: check cleaning
     location_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     weight FLOAT NOT NULL,
@@ -379,54 +370,9 @@ CREATE TABLE recipient_log (
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
 );
 
--- processing table with a price per kg, a name
--- and trash types
-DROP TABLE IF EXISTS processing;
-CREATE TABLE processing (
-    processing_id INT NOT NULL IDENTITY(1,1),
-    name VARCHAR(255) NOT NULL,
-    location_id INT NOT NULL, -- processing location, different locations have different processing units
-    PRIMARY KEY (processing_id),
-    product_id INT NOT NULL, -- product that is produced, different processing units produce different products
-    contract_id INT NOT NULL, -- contract that is used for this processing unit
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    FOREIGN KEY (location_id) REFERENCES locations(location_id),
-    FOREIGN KEY (product_id) REFERENCES products(product_id),
-    FOREIGN KEY (contract_id) REFERENCES contracts(contract_id)
-);
 
--- processing_have_trash_types table
-DROP TABLE IF EXISTS processing_have_trash_types;
-CREATE TABLE processing_have_trash_types (
-    processing_id INT NOT NULL,
-    trash_type_id INT NOT NULL,
-    currency_id INT NOT NULL,
-    kgs_recycled FLOAT NOT NULL, -- how much is recycled per kg of trash
-    PRIMARY KEY (processing_id, trash_type_id),
-    FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
-    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
-);
 
--- processing_have_trash_types_price_per_kg_log table
-DROP TABLE IF EXISTS processing_have_trash_types_price_per_kg_log;
-CREATE TABLE processing_have_trash_types_price_per_kg_log (
-    processing_have_trash_types_price_per_kg_log_id INT NOT NULL IDENTITY(1,1),
-    processing_id INT NOT NULL,
-    trash_type_id INT NOT NULL,
-    currency_id INT NOT NULL,
-    price_per_kg FLOAT NOT NULL,
-    datetime DATETIME NOT NULL,
-    active BIT NOT NULL DEFAULT 1,
-    hash varbinary(64) NOT NULL DEFAULT HASHBYTES('SHA2_256', NEWID()),
-    PRIMARY KEY (processing_have_trash_types_price_per_kg_log_id),
-    FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
-    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE()
-);
+
 
 
 -- table for languages
@@ -465,7 +411,7 @@ CREATE TABLE billing (
     amount DECIMAL(10,3) NOT NULL,
     currency_id INT NOT NULL,
     datetime DATETIME NOT NULL,
-    hash varbinary(64) NOT NULL DEFAULT HASHBYTES('SHA2_256', NEWID()),
+    hash varbinary(64) NOT NULL,
     PRIMARY KEY (billing_id),
     FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
@@ -482,7 +428,7 @@ CREATE TABLE billing_payments (
     amount DECIMAL(10,3) NOT NULL,
     service_contract_id INT NOT NULL,
     datetime DATETIME NOT NULL,
-    hash varbinary(64) NOT NULL DEFAULT HASHBYTES('SHA2_256', NEWID()),
+    hash varbinary(64) NOT NULL,
     PRIMARY KEY (billing_payment_id),
     FOREIGN KEY (billing_id) REFERENCES billing(billing_id),
     FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id),
@@ -496,7 +442,7 @@ CREATE TABLE schedule_logs_have_recipients (
     datetime DATETIME NOT NULL,
     expected_weight FLOAT NOT NULL,
     PRIMARY KEY (schedule_log_id, recipient_id),
-    FOREIGN KEY (schedule_log_id) REFERENCES schedule_logs(schedule_log_id),
+    FOREIGN KEY (schedule_log_id) REFERENCES schedule_log(schedule_log_id),
     FOREIGN KEY (recipient_id) REFERENCES recipients(recipient_id)
 );
 
@@ -509,4 +455,63 @@ CREATE TABLE carbon_footprint_score (
     score FLOAT NOT NULL,
     PRIMARY KEY (carbon_footprint_score_id),
     FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id)
+);
+
+
+
+
+-- certificates have trash types table
+DROP TABLE IF EXISTS certificates_have_trash_types;
+CREATE TABLE certificates_have_trash_types (
+    certificate_id INT NOT NULL,
+    trash_type_id INT NOT NULL,
+    PRIMARY KEY (certificate_id, trash_type_id),
+    FOREIGN KEY (certificate_id) REFERENCES certificates(certificate_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
+);
+-- processing table with a price per kg, a name
+-- and trash types
+DROP TABLE IF EXISTS processing;
+CREATE TABLE processing (
+    processing_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    location_id INT NOT NULL, -- processing location, different locations have different processing units
+    PRIMARY KEY (processing_id),
+    product_id INT NOT NULL, -- product that is produced, different processing units produce different products
+    recycling_contract_id INT NOT NULL, -- contract that is used for this processing unit
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (location_id) REFERENCES locations(location_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
+);
+-- processing_have_trash_types table
+DROP TABLE IF EXISTS processing_have_trash_types;
+CREATE TABLE processing_have_trash_types (
+    processing_id INT NOT NULL,
+    trash_type_id INT NOT NULL,
+    currency_id INT NOT NULL,
+    kgs_recycled FLOAT NOT NULL, -- how much is recycled per kg of trash
+    PRIMARY KEY (processing_id, trash_type_id),
+    FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
+    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
+);
+-- processing_have_trash_types_price_per_kg_log table
+DROP TABLE IF EXISTS processing_have_trash_types_price_per_kg_log;
+CREATE TABLE processing_have_trash_types_price_per_kg_log (
+    processing_have_trash_types_price_per_kg_log_id INT NOT NULL IDENTITY(1,1),
+    processing_id INT NOT NULL,
+    trash_type_id INT NOT NULL,
+    currency_id INT NOT NULL,
+    price_per_kg FLOAT NOT NULL,
+    datetime DATETIME NOT NULL,
+    active BIT NOT NULL DEFAULT 1,
+    hash varbinary(64) NOT NULL,
+    PRIMARY KEY (processing_have_trash_types_price_per_kg_log_id),
+    FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
+    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
