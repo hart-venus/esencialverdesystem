@@ -515,3 +515,19 @@ CREATE TABLE processings_have_recycling_contracts (
     FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
     FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
 );
+
+
+-- sales table for products, has a location, price and datetime
+DROP TABLE IF EXISTS sales;
+CREATE TABLE sales (
+    sale_id INT NOT NULL IDENTITY(1,1),
+    product_id INT NOT NULL,
+    location_id INT NOT NULL,
+    currency_id INT NOT NULL,
+    price DECIMAL(10,3) NOT NULL,
+    datetime DATETIME NOT NULL,
+    PRIMARY KEY (sale_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    FOREIGN KEY (location_id) REFERENCES locations(location_id),
+    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
+);
