@@ -11,20 +11,31 @@ DROP TABLE IF EXISTS currencies_dollar_exchange_rate_log;
 CREATE TABLE currencies_dollar_exchange_rate_log (
     currency_dollar_exchange_rate_log_id INT NOT NULL IDENTITY(1,1),
     currency_id INT NOT NULL,
-    exchange_rate DECIMAL(10,3) NOT NULL,
+    exchange_rate DECIMAL(12,4) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    start_date DATETIME NOT NULL DEFAULT GETDATE(),
+    end_date DATETIME NULL,
     active BIT NOT NULL DEFAULT 1,
-    hash varbinary(64) NOT NULL,
+    checksum varbinary(64) NOT NULL,
     PRIMARY KEY (currency_dollar_exchange_rate_log_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
+);
+-- create countries table
+DROP TABLE IF EXISTS countries;
+CREATE TABLE countries (
+    country_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (country_id)
 );
 
 -- create province table
 DROP TABLE IF EXISTS provinces;
 CREATE TABLE provinces (
     province_id INT NOT NULL IDENTITY(1,1),
+    country_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (province_id)
+    PRIMARY KEY (province_id),
+    FOREIGN KEY (country_id) REFERENCES countries(country_id)
 );
 
 -- provinces have currencies
@@ -48,37 +59,48 @@ CREATE TABLE cities (
     FOREIGN KEY (province_id) REFERENCES provinces(province_id)
 );
 
--- create zipcodes table with foreign key
-DROP TABLE IF EXISTS zipcodes;
-CREATE TABLE zipcodes (
-    zipcode_id INT NOT NULL IDENTITY(1,1),
-    city_id INT NOT NULL,
-    zipcode VARCHAR(50) NOT NULL,
-    PRIMARY KEY (zipcode_id),
-    FOREIGN KEY (city_id) REFERENCES cities(city_id)
-);
 
 -- create location table with foreign key and point
 DROP TABLE IF EXISTS locations;
 CREATE TABLE locations (
     location_id INT NOT NULL IDENTITY(1,1),
-    zipcode_id INT NOT NULL,
+    city_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     coordinates GEOMETRY NOT NULL,
     PRIMARY KEY (location_id),
-    FOREIGN KEY (zipcode_id) REFERENCES zipcodes(zipcode_id)
+    FOREIGN KEY (city_id) REFERENCES cities(city_id)
+);
+
+-- contact info types table
+DROP TABLE IF EXISTS contact_info_types;
+CREATE TABLE contact_info_types (
+    contact_info_type_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (contact_info_type_id)
 );
 
 -- create contact_info table
 DROP TABLE IF EXISTS contact_info;
 CREATE TABLE contact_info (
     contact_info_id INT NOT NULL IDENTITY(1,1),
-    phone VARCHAR(50) NOT NULL,
-    email VARCHAR(255) NOT NULL,
     PRIMARY KEY (contact_info_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    hash varbinary(64) NOT NULL
+    checksum varbinary(64) NOT NULL
+);
+
+-- create contact_info_has_contact_info_types table
+DROP TABLE IF EXISTS contact_info_has_contact_info_types;
+CREATE TABLE contact_info_has_contact_info_types (
+    contact_info_id INT NOT NULL,
+    contact_info_type_id INT NOT NULL,
+    value VARCHAR(255) NOT NULL,
+    PRIMARY KEY (contact_info_id, contact_info_type_id),
+    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id),
+    FOREIGN KEY (contact_info_type_id) REFERENCES contact_info_types(contact_info_type_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    checksum varbinary(64) NOT NULL
 );
 
 -- create a producer_parent table with contact_info
@@ -176,11 +198,13 @@ CREATE TABLE collection_log (
     action tinyint NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: checkup
     producer_id INT NULL,
     datetime DATETIME NOT NULL,
+    responsible_person_id INT NOT NULL,
     PRIMARY KEY (collection_log_id),
     FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
     FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
-    FOREIGN KEY (company_id) REFERENCES companies(company_id)
+    FOREIGN KEY (company_id) REFERENCES companies(company_id),
+    FOREIGN KEY (responsible_person_id) REFERENCES people(person_id),
 );
 -- service_contract with producer, schedule, price, datetime, active and expiration
 DROP TABLE IF EXISTS service_contracts;
@@ -288,7 +312,7 @@ CREATE TABLE recipient_types_have_trash_types (
 DROP TABLE IF EXISTS recycling_contracts;
 CREATE TABLE recycling_contracts (
     recycling_contract_id INT NOT NULL IDENTITY(1,1),
-    hash varbinary(64) NOT NULL,
+    checksum varbinary(64) NOT NULL,
     valid_from DATETIME NOT NULL,
     valid_to DATETIME NOT NULL,
     service_contract_id INT NOT NULL,
@@ -333,7 +357,7 @@ CREATE TABLE product_price_per_location_log (
     price FLOAT NOT NULL,
     datetime DATETIME NOT NULL,
     active BIT NOT NULL DEFAULT 1,
-    hash varbinary(64) NOT NULL,
+    checksum varbinary(64) NOT NULL,
     PRIMARY KEY (product_price_per_location_log_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
@@ -406,7 +430,7 @@ CREATE TABLE billing (
     amount DECIMAL(10,3) NOT NULL,
     currency_id INT NOT NULL,
     datetime DATETIME NOT NULL,
-    hash varbinary(64) NOT NULL,
+    checksum varbinary(64) NOT NULL,
     PRIMARY KEY (billing_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
@@ -423,7 +447,7 @@ CREATE TABLE billing_payments (
     amount DECIMAL(10,3) NOT NULL,
     service_contract_id INT NOT NULL,
     datetime DATETIME NOT NULL,
-    hash varbinary(64) NOT NULL,
+    checksum varbinary(64) NOT NULL,
     PRIMARY KEY (billing_payment_id),
     FOREIGN KEY (billing_id) REFERENCES billing(billing_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
@@ -498,7 +522,7 @@ CREATE TABLE processing_have_trash_types_price_per_kg_log (
     price_per_kg FLOAT NOT NULL,
     datetime DATETIME NOT NULL,
     active BIT NOT NULL DEFAULT 1,
-    hash varbinary(64) NOT NULL,
+    checksum varbinary(64) NOT NULL,
     PRIMARY KEY (processing_have_trash_types_price_per_kg_log_id),
     FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
     FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
@@ -531,3 +555,38 @@ CREATE TABLE sales (
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
+-- people table
+DROP TABLE IF EXISTS people;
+CREATE TABLE people (
+    person_id INT NOT NULL IDENTITY(1,1),
+    PRIMARY KEY (person_id)
+);
+
+-- producers_have_people table
+DROP TABLE IF EXISTS producers_have_people;
+CREATE TABLE producers_have_people (
+    producer_id INT NOT NULL,
+    person_id INT NOT NULL,
+    PRIMARY KEY (producer_id, person_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
+    FOREIGN KEY (person_id) REFERENCES people(person_id)
+);
+-- companies_have_people table
+DROP TABLE IF EXISTS companies_have_people;
+CREATE TABLE companies_have_people (
+    company_id INT NOT NULL,
+    person_id INT NOT NULL,
+    PRIMARY KEY (company_id, person_id),
+    FOREIGN KEY (company_id) REFERENCES companies(company_id),
+    FOREIGN KEY (person_id) REFERENCES people(person_id)
+);
+-- people_have_contact_info table
+DROP TABLE IF EXISTS people_have_contact_info;
+CREATE TABLE people_have_contact_info (
+    person_id INT NOT NULL,
+    contact_info_id INT NOT NULL,
+    PRIMARY KEY (person_id, contact_info_id),
+    FOREIGN KEY (person_id) REFERENCES people(person_id),
+    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id)
+);
+
