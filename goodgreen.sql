@@ -187,6 +187,41 @@ CREATE TABLE collection_points (
     active BIT NOT NULL DEFAULT 1
 );
 
+-- people table
+DROP TABLE IF EXISTS people;
+CREATE TABLE people (
+    person_id INT NOT NULL IDENTITY(1,1),
+    PRIMARY KEY (person_id)
+);
+
+-- producers_have_people table
+DROP TABLE IF EXISTS producers_have_people;
+CREATE TABLE producers_have_people (
+    producer_id INT NOT NULL,
+    person_id INT NOT NULL,
+    PRIMARY KEY (producer_id, person_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
+    FOREIGN KEY (person_id) REFERENCES people(person_id)
+);
+-- companies_have_people table
+DROP TABLE IF EXISTS companies_have_people;
+CREATE TABLE companies_have_people (
+    company_id INT NOT NULL,
+    person_id INT NOT NULL,
+    PRIMARY KEY (company_id, person_id),
+    FOREIGN KEY (company_id) REFERENCES companies(company_id),
+    FOREIGN KEY (person_id) REFERENCES people(person_id)
+);
+-- people_have_contact_info table
+DROP TABLE IF EXISTS people_have_contact_info;
+CREATE TABLE people_have_contact_info (
+    person_id INT NOT NULL,
+    contact_info_id INT NOT NULL,
+    PRIMARY KEY (person_id, contact_info_id),
+    FOREIGN KEY (person_id) REFERENCES people(person_id),
+    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id)
+);
+
 -- collection_log table with collection_point and fleet, company or producer, and datetime
 DROP TABLE IF EXISTS collection_log;
 CREATE TABLE collection_log (
@@ -555,38 +590,5 @@ CREATE TABLE sales (
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
--- people table
-DROP TABLE IF EXISTS people;
-CREATE TABLE people (
-    person_id INT NOT NULL IDENTITY(1,1),
-    PRIMARY KEY (person_id)
-);
 
--- producers_have_people table
-DROP TABLE IF EXISTS producers_have_people;
-CREATE TABLE producers_have_people (
-    producer_id INT NOT NULL,
-    person_id INT NOT NULL,
-    PRIMARY KEY (producer_id, person_id),
-    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
-    FOREIGN KEY (person_id) REFERENCES people(person_id)
-);
--- companies_have_people table
-DROP TABLE IF EXISTS companies_have_people;
-CREATE TABLE companies_have_people (
-    company_id INT NOT NULL,
-    person_id INT NOT NULL,
-    PRIMARY KEY (company_id, person_id),
-    FOREIGN KEY (company_id) REFERENCES companies(company_id),
-    FOREIGN KEY (person_id) REFERENCES people(person_id)
-);
--- people_have_contact_info table
-DROP TABLE IF EXISTS people_have_contact_info;
-CREATE TABLE people_have_contact_info (
-    person_id INT NOT NULL,
-    contact_info_id INT NOT NULL,
-    PRIMARY KEY (person_id, contact_info_id),
-    FOREIGN KEY (person_id) REFERENCES people(person_id),
-    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id)
-);
 
