@@ -274,19 +274,9 @@ CREATE TABLE service_contracts (
     end_date DATETIME NOT NULL,
     active BIT NOT NULL DEFAULT 1,
     PRIMARY KEY (service_contract_id),
+    FOREIGN KEY (service_contact_info) REFERENCES contact_info(contact_info_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
-);
--- service_contracts_have_prices_log table
-DROP TABLE IF EXISTS service_contracts_have_prices_log;
-CREATE TABLE service_contracts_have_prices_log (
-    service_contract_id INT NOT NULL,
-    price DECIMAL(10,3) NOT NULL,
-    currency_id INT NOT NULL,
-    datetime DATETIME NOT NULL,
-    PRIMARY KEY (service_contract_id, datetime),
-    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
 
@@ -595,18 +585,16 @@ CREATE TABLE billing_payments (
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id)
 );
--- schedule_logs_have_recipients with expected amount of trash
-DROP TABLE IF EXISTS schedule_logs_have_recipients;
-CREATE TABLE schedule_logs_have_recipients (
-    schedule_log_id BIGINT NOT NULL,
-    recipient_id BIGINT NOT NULL,
-    datetime DATETIME NOT NULL,
-    expected_weight FLOAT NOT NULL,
-    PRIMARY KEY (schedule_log_id, recipient_id),
-    FOREIGN KEY (schedule_log_id) REFERENCES schedule_log(schedule_log_id),
-    FOREIGN KEY (recipient_id) REFERENCES recipients(recipient_id)
+-- schedule_logs_have_recipient_types with expected amount of trash
+DROP TABLE IF EXISTS schedule_logs_have_recipient_types;
+CREATE TABLE schedule_logs_have_recipient_types (
+    schedule_log_id INT NOT NULL,
+    recipient_type_id INT NOT NULL,
+    expected_amount FLOAT NOT NULL,
+    PRIMARY KEY (schedule_log_id, recipient_type_id),
+    FOREIGN KEY (schedule_log_id) REFERENCES schedule_logs(schedule_log_id),
+    FOREIGN KEY (recipient_type_id) REFERENCES recipient_types(recipient_type_id)
 );
-
 
 DROP TABLE IF EXISTS carbon_footprint_log;
 CREATE TABLE carbon_footprint_log (

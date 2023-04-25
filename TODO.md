@@ -3,11 +3,11 @@
 ## Feedback del profesor
 - [ ] Fletes no parece darme mayor información, no se sabe prácticamente nada , incluso no se sabe si es un vehículo o serán varios
 - [ ] Company y producer son redundantes en collectionlog, dicha tabla es de info sensible
-- [ ] Están haciendo lo que mencionamos en clase que iba a estar casi imposible y es planificar los recipientes que se van a usar en una recolección
+
 - [ ] Contactinfo no está sirviendo de nada
     Esta mal la relación contactinfo y confactinfohascontactinfotypes
     Me suena que sobra una tabla y mas bien eso se resuelve en producerparents y peoplehavecontacinfo y así
-- [ ] El precio no va al service contract, es mucho más detallado
+- [ ] El precio no va al service contract, es mucho más detallado (what?!)
 - [ ] Los nombres de las tablas en algunos casos les están quedando muy grandes, mejor póngale un nombre más abtracto o conceptual
 - [ ] La tabla processing no hace falta
 - [ ] Es importante sabe que insumos reciclados o reutilizados sirven para fabricar los productos, pero sin embargo eso podría sobrar, porque lo que realmente nos interesa saber es dado un lote de productos producidos, saber los lotes de salidas de procesos que fueron usados para su fabricación, para con ello ubicar los contractos y porcentajes respectivos a ser repartidos
@@ -30,4 +30,5 @@
 - [X] El cleanliness en recipientes no hace sentido, podrían tener un estado eso si
 - [X] Los contratos porque a los certificados?
 - [X] No tengan un cleanliness en el recipienteslog, más bien lo que cambia en el action y así pueden suceder mucho más cosas que solo decir si está limpio o no
+- [X] Están haciendo lo que mencionamos en clase que iba a estar casi imposible y es planificar los recipientes que se van a usar en una recolección
 ## Nuevas cosas del caso #3
