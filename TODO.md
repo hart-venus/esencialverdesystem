@@ -12,7 +12,6 @@
 - [ ] Los nombres de las tablas en algunos casos les están quedando muy grandes, mejor póngale un nombre más abtracto o conceptual
 - [ ] La tabla processing no hace falta
 - [ ] Es importante sabe que insumos reciclados o reutilizados sirven para fabricar los productos, pero sin embargo eso podría sobrar, porque lo que realmente nos interesa saber es dado un lote de productos producidos, saber los lotes de salidas de procesos que fueron usados para su fabricación, para con ello ubicar los contractos y porcentajes respectivos a ser repartidos
-- [ ] No tiene nada para repartir en caso de tener beneficiaros de mi exceso de contamientación
 ### Done
 - [X] Carbonfootprint es info sensible
 - [X] Su modelo no permite que un país tenga más de una moneda, salvo asignandolose a otra provincia lo cual estaría mal, o bien para meter colones tendrámos que meterlo 7 veces en esu modelo
@@ -33,5 +32,6 @@
 - [X] No tengan un cleanliness en el recipienteslog, más bien lo que cambia en el action y así pueden suceder mucho más cosas que solo decir si está limpio o no
 - [X] Están haciendo lo que mencionamos en clase que iba a estar casi imposible y es planificar los recipientes que se van a usar en una recolección
 - [X] El precio no va al service contract, es mucho más detallado
+- [X] No tiene nada para repartir en caso de tener beneficiaros de mi exceso de contamientación
 
 ## Nuevas cosas del caso #3
