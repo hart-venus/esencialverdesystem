@@ -25,9 +25,11 @@
 - [ ] La tabla proessing no hace falta
 - [ ] Los recycle contracts son parte del contrato también, es un todo
 - [ ] Es importante sabe que insumos reciclados o reutilizados sirven para fabricar los productos, pero sin embargo eso podría sobrar, porque lo que realmente nos interesa saber es dado un lote de productos producidos, saber los lotes de salidas de procesos que fueron usados para su fabricación, para con ello ubicar los contractos y porcentajes respectivos a ser repartidos
-- [ ] Su modelo no permite que un país tenga más de una moneda, salvo asignandolose a otra provincia lo cual estaría mal, o bien para meter colones tendrámos que meterlo 7 veces en esu modelo
-- [X] No es multi idioma
+
 - [ ] No tiene nada para repartir en caso de tener beneficiaros de mi exceso de contamientación
-- [ ] No veo regiones
+### Done
+- [X] Su modelo no permite que un país tenga más de una moneda, salvo asignandolose a otra provincia lo cual estaría mal, o bien para meter colones tendrámos que meterlo 7 veces en esu modelo
+- [X] No es multi idioma
+- [X] No veo regiones
 
 ## Nuevas cosas del caso #3

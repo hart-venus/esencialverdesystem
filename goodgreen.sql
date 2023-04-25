@@ -38,16 +38,6 @@ CREATE TABLE provinces (
     FOREIGN KEY (country_id) REFERENCES countries(country_id)
 );
 
--- provinces have currencies
-DROP TABLE IF EXISTS provinces_have_currencies;
-CREATE TABLE provinces_have_currencies (
-    province_id INT NOT NULL,
-    currency_id INT NOT NULL,
-    PRIMARY KEY (province_id, currency_id),
-    FOREIGN KEY (province_id) REFERENCES provinces(province_id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id),
-    active BIT NOT NULL DEFAULT 1
-);
 
 -- create city table
 DROP TABLE IF EXISTS cities;
@@ -67,6 +57,7 @@ CREATE TABLE locations (
     city_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     coordinates GEOMETRY NOT NULL,
+    zipcode VARCHAR(255) NOT NULL,
     PRIMARY KEY (location_id),
     FOREIGN KEY (city_id) REFERENCES cities(city_id)
 );
@@ -87,6 +78,30 @@ CREATE TABLE contact_info (
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     checksum varbinary(64) NOT NULL
+);
+
+-- create region table with id and name
+DROP TABLE IF EXISTS regions;
+CREATE TABLE regions (
+    region_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (region_id)
+);
+
+-- create region_areas table with region_id, optional
+-- city_id, optional province_id, optional country_id
+DROP TABLE IF EXISTS region_areas;
+CREATE TABLE region_areas (
+    region_area_id INT NOT NULL IDENTITY(1,1),
+    region_id INT NOT NULL,
+    city_id INT NULL,
+    province_id INT NULL,
+    country_id INT NULL,
+    PRIMARY KEY (region_area_id),
+    FOREIGN KEY (region_id) REFERENCES regions(region_id),
+    FOREIGN KEY (city_id) REFERENCES cities(city_id),
+    FOREIGN KEY (province_id) REFERENCES provinces(province_id),
+    FOREIGN KEY (country_id) REFERENCES countries(country_id)
 );
 
 -- create contact_info_has_contact_info_types table
@@ -143,18 +158,18 @@ CREATE TABLE companies (
     active BIT NOT NULL DEFAULT 1
 );
 
--- companies have locations table
-DROP TABLE IF EXISTS companies_have_locations;
-CREATE TABLE companies_have_locations (
+-- companies have regions
+DROP TABLE IF EXISTS companies_have_regions;
+CREATE TABLE companies_have_regions (
     company_id INT NOT NULL,
-    location_id INT NOT NULL,
-    PRIMARY KEY (company_id, location_id),
+    region_id INT NOT NULL,
+    PRIMARY KEY (company_id, region_id),
     FOREIGN KEY (company_id) REFERENCES companies(company_id),
-    FOREIGN KEY (location_id) REFERENCES locations(location_id),
+    FOREIGN KEY (region_id) REFERENCES regions(region_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     active BIT NOT NULL DEFAULT 1
-
 );
-
 -- esencial verde fleet table
 DROP TABLE IF EXISTS fleets;
 CREATE TABLE fleets (
@@ -639,5 +654,3 @@ CREATE TABLE sales (
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
-
-
