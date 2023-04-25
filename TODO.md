@@ -1,9 +1,7 @@
 # To-do
 ---
 ## Feedback del profesor
-- [ ] Fletes no parece darme mayor información, no se sabe prácticamente nada , incluso no se sabe si es un vehículo o serán varios
 
-- [ ] Los nombres de las tablas en algunos casos les están quedando muy grandes, mejor póngale un nombre más abtracto o conceptual
 
 ### Done
 - [X] Carbonfootprint es info sensible
@@ -32,4 +30,7 @@
     Me suena que sobra una tabla y mas bien eso se resuelve en producerparents y peoplehavecontacinfo y así
 - [X] La tabla processing no hace falta
 - Es importante sabe que insumos reciclados o reutilizados sirven para fabricar los productos, pero sin embargo eso podría sobrar, porque lo que realmente nos interesa saber es dado un lote de productos producidos, saber los lotes de salidas de procesos que fueron usados para su fabricación, para con ello ubicar los contractos y porcentajes respectivos a ser repartidos
+- [X] Los nombres de las tablas en algunos casos les están quedando muy grandes, mejor póngale un nombre más abtracto o conceptual
+- [X] Fletes no parece darme mayor información, no se sabe prácticamente nada , incluso no se sabe si es un vehículo o serán varios
+
 ## Nuevas cosas del caso #3

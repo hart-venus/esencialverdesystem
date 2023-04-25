@@ -1,3 +1,47 @@
+
+
+
+-- empresas regionales (grandes) y locales (pequeñas) que recolectan basura
+-- company table (no parent company, local or regional)
+DROP TABLE IF EXISTS companies;
+CREATE TABLE companies (
+    company_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (company_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    active BIT NOT NULL DEFAULT 1
+);
+-- create a producer_parent table with contact_info
+DROP TABLE IF EXISTS producer_parents; -- big companies like kfc, mcdonalds, etc
+CREATE TABLE producer_parents (
+    producer_parent_id INT NOT NULL IDENTITY(1,1),
+
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (producer_parent_id),
+);
+-- create a producer table with contact_info and producer_parents
+DROP TABLE IF EXISTS producers; -- single establishments like a kfc, mcdonalds, etc
+CREATE TABLE producers (
+    producer_id INT NOT NULL IDENTITY(1,1),
+    producer_parent_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (producer_id),
+    FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    active BIT NOT NULL DEFAULT 1
+);
+
+
+-- frequency
+DROP TABLE IF EXISTS frequencies;
+CREATE TABLE frequencies (
+    frequency_id INT NOT NULL IDENTITY(1,1),
+    frequency VARCHAR(255) NOT NULL,
+    PRIMARY KEY (frequency_id)
+);
+
 -- create currency table
 DROP TABLE IF EXISTS currencies;
 CREATE TABLE currencies (
@@ -5,6 +49,48 @@ CREATE TABLE currencies (
     name VARCHAR(255) NOT NULL,
     symbol VARCHAR(10) NOT NULL,
     PRIMARY KEY (currency_id),
+);
+-- people table
+DROP TABLE IF EXISTS people;
+CREATE TABLE people (
+    person_id INT NOT NULL IDENTITY(1,1),
+    PRIMARY KEY (person_id)
+);
+-- esencial verde fleet table
+DROP TABLE IF EXISTS fleets;
+CREATE TABLE fleets (
+    fleet_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (fleet_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    active BIT NOT NULL DEFAULT 1
+);
+-- product that ends up being produced
+DROP TABLE IF EXISTS products;
+CREATE TABLE products (
+    product_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    currency_id INT NOT NULL,
+    kg_to_produce FLOAT NOT NULL,
+    PRIMARY KEY (product_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
+);
+
+-- esencial verde car table
+DROP TABLE IF EXISTS cars;
+CREATE TABLE cars (
+    car_id INT NOT NULL IDENTITY(1,1),
+    fleet_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (car_id),
+    capacity DECIMAL(10,3) NOT NULL,
+    FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    active BIT NOT NULL DEFAULT 1
 );
 
 -- create movement_types table
@@ -14,6 +100,23 @@ CREATE TABLE movement_types (
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (movement_type_id)
 );
+
+-- service_contract with producer, schedules, datetime, active and expiration
+DROP TABLE IF EXISTS service_contracts;
+CREATE TABLE service_contracts (
+    service_contract_id INT NOT NULL IDENTITY(1,1),
+    producer_id INT NOT NULL,
+
+    currency_id INT NOT NULL,
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
+    active BIT NOT NULL DEFAULT 1,
+    PRIMARY KEY (service_contract_id),
+    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
+    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
+);
+
 -- currencies_dollar_exchange_rate_log
 DROP TABLE IF EXISTS currencies_dollar_exchange_rate_log;
 CREATE TABLE currencies_dollar_exchange_rate_log (
@@ -69,6 +172,47 @@ CREATE TABLE locations (
     PRIMARY KEY (location_id),
     FOREIGN KEY (city_id) REFERENCES cities(city_id)
 );
+-- collection_points table with location and name
+DROP TABLE IF EXISTS collection_points;
+CREATE TABLE collection_points (
+    collection_point_id INT NOT NULL IDENTITY(1,1),
+    location_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    producer_id INT NULL,
+    company_id INT NULL,
+    is_dropoff BIT NOT NULL, -- 0: pickup, 1: dropoff
+    PRIMARY KEY (collection_point_id),
+    FOREIGN KEY (location_id) REFERENCES locations(location_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
+    FOREIGN KEY (company_id) REFERENCES companies(company_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    active BIT NOT NULL DEFAULT 1
+);
+-- a schedule_log for a pickup or dropoff with datetime, frequency, and collection or dropoff point
+DROP TABLE IF EXISTS schedule_log;
+CREATE TABLE schedule_log (
+    schedule_log_id BIGINT NOT NULL IDENTITY(1,1),
+    fleet_id INT NULL,
+    company_id INT NULL,
+    producer_id INT NULL,
+    collection_point_id INT NULL, -- is either a dropoff or pickup point
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
+    service_contract_id INT NOT NULL,
+    movement_type_id INT NOT NULL,
+    frequency_id INT NOT NULL,
+    active BIT NOT NULL DEFAULT 1,
+    PRIMARY KEY (schedule_log_id),
+    FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
+    FOREIGN KEY (frequency_id) REFERENCES frequencies(frequency_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
+    FOREIGN KEY (company_id) REFERENCES companies(company_id),
+    FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
+    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
+    FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id)
+);
+
 
 -- contact info types table
 DROP TABLE IF EXISTS contact_info_types;
@@ -113,14 +257,7 @@ CREATE TABLE people_have_contact_info_types (
     FOREIGN KEY (contact_info_type_id) REFERENCES contact_info_types(contact_info_type_id)
 );
 
--- create a producer_parent table with contact_info
-DROP TABLE IF EXISTS producer_parents; -- big companies like kfc, mcdonalds, etc
-CREATE TABLE producer_parents (
-    producer_parent_id INT NOT NULL IDENTITY(1,1),
 
-    name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (producer_parent_id),
-);
 -- producer_parents_have_people
 DROP TABLE IF EXISTS producer_parents_have_people;
 CREATE TABLE producer_parents_have_people (
@@ -132,18 +269,6 @@ CREATE TABLE producer_parents_have_people (
 );
 
 
--- create a producer table with contact_info and producer_parents
-DROP TABLE IF EXISTS producers; -- single establishments like a kfc, mcdonalds, etc
-CREATE TABLE producers (
-    producer_id INT NOT NULL IDENTITY(1,1),
-    producer_parent_id INT NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (producer_id),
-    FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    active BIT NOT NULL DEFAULT 1
-);
 
 -- producers_have_people
 DROP TABLE IF EXISTS producers_have_people;
@@ -156,17 +281,7 @@ CREATE TABLE producers_have_people (
 );
 
 
--- empresas regionales (grandes) y locales (pequeñas) que recolectan basura
--- company table (no parent company, local or regional)
-DROP TABLE IF EXISTS companies;
-CREATE TABLE companies (
-    company_id INT NOT NULL IDENTITY(1,1),
-    name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (company_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    active BIT NOT NULL DEFAULT 1
-);
+
 -- companies have people
 DROP TABLE IF EXISTS companies_have_people;
 CREATE TABLE companies_have_people (
@@ -190,42 +305,10 @@ CREATE TABLE companies_have_regions (
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     active BIT NOT NULL DEFAULT 1
 );
--- esencial verde fleet table
-DROP TABLE IF EXISTS fleets;
-CREATE TABLE fleets (
-    fleet_id INT NOT NULL IDENTITY(1,1),
-    name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (fleet_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    capacity DECIMAL(10,3) NOT NULL,
-    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    active BIT NOT NULL DEFAULT 1
-);
 
--- collection_points table with location and name
-DROP TABLE IF EXISTS collection_points;
-CREATE TABLE collection_points (
-    collection_point_id INT NOT NULL IDENTITY(1,1),
-    location_id INT NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    producer_id INT NULL,
-    company_id INT NULL,
-    is_dropoff BIT NOT NULL, -- 0: pickup, 1: dropoff
-    PRIMARY KEY (collection_point_id),
-    FOREIGN KEY (location_id) REFERENCES locations(location_id),
-    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
-    FOREIGN KEY (company_id) REFERENCES companies(company_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    active BIT NOT NULL DEFAULT 1
-);
 
--- people table
-DROP TABLE IF EXISTS people;
-CREATE TABLE people (
-    person_id INT NOT NULL IDENTITY(1,1),
-    PRIMARY KEY (person_id)
-);
+
+
 
 -- producers_have_people table
 DROP TABLE IF EXISTS producers_have_people;
@@ -255,34 +338,19 @@ CREATE TABLE collection_log (
     service_contract_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     responsible_person_id INT NOT NULL,
+    schedule_log_id BIGINT NOT NULL,
 
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     checksum varbinary (64) NOT NULL,
     PRIMARY KEY (collection_log_id),
     FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
-    FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
-    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
-    FOREIGN KEY (company_id) REFERENCES companies(company_id),
+    FOREIGN KEY (schedule_log_id) REFERENCES schedule_log(schedule_log_id),
     FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (responsible_person_id) REFERENCES people(person_id),
 );
--- service_contract with producer, schedules, datetime, active and expiration
-DROP TABLE IF EXISTS service_contracts;
-CREATE TABLE service_contracts (
-    service_contract_id INT NOT NULL IDENTITY(1,1),
-    producer_id INT NOT NULL,
 
-    currency_id INT NOT NULL,
-    start_date DATETIME NOT NULL,
-    end_date DATETIME NOT NULL,
-    active BIT NOT NULL DEFAULT 1,
-    PRIMARY KEY (service_contract_id),
-    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
-    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
-);
 
 
 -- certificates table with datetime, and expiration
@@ -298,36 +366,8 @@ CREATE TABLE certificates (
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
 );
 
--- frequency
-DROP TABLE IF EXISTS frequencies;
-CREATE TABLE frequencies (
-    frequency_id INT NOT NULL IDENTITY(1,1),
-    frequency VARCHAR(255) NOT NULL,
-    PRIMARY KEY (frequency_id)
-);
--- a schedule_log for a pickup or dropoff with datetime, frequency, and collection or dropoff point
-DROP TABLE IF EXISTS schedule_log;
-CREATE TABLE schedule_log (
-    schedule_log_id BIGINT NOT NULL IDENTITY(1,1),
-    fleet_id INT NULL,
-    company_id INT NULL,
-    producer_id INT NULL,
-    collection_point_id INT NULL, -- is either a dropoff or pickup point
-    start_date DATETIME NOT NULL,
-    end_date DATETIME NOT NULL,
-    service_contract_id INT NOT NULL,
-    movement_type_id INT NOT NULL,
-    frequency_id INT NOT NULL,
-    active BIT NOT NULL DEFAULT 1,
-    PRIMARY KEY (schedule_log_id),
-    FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
-    FOREGIN KEY (frequency_id) REFERENCES frequencies(frequency_id),
-    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
-    FOREIGN KEY (company_id) REFERENCES companies(company_id),
-    FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
-    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
-    FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id)
-);
+
+
 
 -- trash types table
 DROP TABLE IF EXISTS trash_types;
@@ -405,6 +445,14 @@ CREATE TABLE materials (
     PRIMARY KEY (material_id),
 );
 
+-- measure table
+DROP TABLE IF EXISTS measures;
+CREATE TABLE measures (
+    measure_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (measure_id),
+);
+
 -- materialsXproducts table
 DROP TABLE IF EXISTS materialsXproducts;
 CREATE TABLE materialsXproducts (
@@ -419,13 +467,7 @@ CREATE TABLE materialsXproducts (
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
--- measure table
-DROP TABLE IF EXISTS measures;
-CREATE TABLE measures (
-    measure_id INT NOT NULL IDENTITY(1,1),
-    name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (measure_id),
-);
+
 
 -- products recycled table
 DROP TABLE IF EXISTS produced_products_log;
@@ -455,18 +497,7 @@ CREATE TABLE percentages (
     FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
 );
 
--- product that ends up being produced
-DROP TABLE IF EXISTS products;
-CREATE TABLE products (
-    product_id INT NOT NULL IDENTITY(1,1),
-    name VARCHAR(255) NOT NULL,
-    currency_id INT NOT NULL,
-    kg_to_produce FLOAT NOT NULL,
-    PRIMARY KEY (product_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
-);
+
 
 -- product_price_per_location_log
 DROP TABLE IF EXISTS product_price_per_location_log;
@@ -596,7 +627,7 @@ CREATE TABLE translations (
     post_time DATETIME NOT NULL,
     active BIT NOT NULL DEFAULT 1,
     language_id INT NOT NULL,
-    objectType_id INT NOT NULL,
+    objectType_id BIGINT NOT NULL,
     PRIMARY KEY (translation_id),
     FOREIGN KEY (language_id) REFERENCES languages(language_id),
     FOREIGN KEY (objectType_id) REFERENCES objectTypes(objectType_id)
@@ -630,7 +661,6 @@ CREATE TABLE transactions (
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     checksum varbinary(64) NOT NULL, -- sha256(sum(values), secret)
     PRIMARY KEY (transaction_id),
-    FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id),
 );
 
 -- Payments table
@@ -645,7 +675,6 @@ CREATE TABLE payments (
     checksum varbinary(64) NOT NULL, -- sha256(sum(values), secret)
     PRIMARY KEY (payment_id),
     FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id),
     FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
 );
@@ -653,11 +682,11 @@ CREATE TABLE payments (
 -- schedule_logs_have_recipient_types with expected amount of trash
 DROP TABLE IF EXISTS schedule_logs_have_recipient_types;
 CREATE TABLE schedule_logs_have_recipient_types (
-    schedule_log_id INT NOT NULL,
+    schedule_log_id BIGINT NOT NULL,
     recipient_type_id INT NOT NULL,
     expected_amount FLOAT NOT NULL,
     PRIMARY KEY (schedule_log_id, recipient_type_id),
-    FOREIGN KEY (schedule_log_id) REFERENCES schedule_logs(schedule_log_id),
+    FOREIGN KEY (schedule_log_id) REFERENCES schedule_log(schedule_log_id),
     FOREIGN KEY (recipient_type_id) REFERENCES recipient_types(recipient_type_id)
 );
 
