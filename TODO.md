@@ -3,7 +3,7 @@
 ## Feedback del profesor
 - [ ] Fletes no parece darme mayor información, no se sabe prácticamente nada , incluso no se sabe si es un vehículo o serán varios
 - [ ] Todo lo que son transacciones, logs etc que son archivos de alto crecimiento mejor que las llaves sean bigint
-- [ ] Company y producer son redundantes en collecitonlog, dicha tabla es de info sensible
+- [ ] Company y producer son redundantes en collectionlog, dicha tabla es de info sensible
 - [ ] No tengan un cleanliness en el recipienteslog, más bien lo que cambia en el action y así pueden suceder mucho más cosas que solo decir si está limpio o no
 - [ ] El weight supongo que aguanta nulo pues solamente en planta podrían estarlo pensando, en el action de entrega
 - [ ] El cleanliness en recipientes no hace sentido, podrían tener un estado eso si
@@ -12,7 +12,7 @@
 - [ ] Supongo que en general companyid puede ser null pues se refiere a la compañía que recoge el producto? O tienen alguna forma de sin importar la forma siempre exista un company
 - [ ] La frecuencia  no puede ser un varchar, tienen que haber datos que permita a la base de datos estimar bien cuando van a suceder las cosas, un texto no nos sirve para eso
 
-- [ ] En companies el bit de islocal no parece tener sentido, i mean no debería diferenciarse no causa nada
+
 - [ ] Contactinfo no está sirviendo de nada
 - [ ] Esta mal la relación contactinfo y confactinfohascontactinfotypes
 - [ ] Me suena que sobra una tabla y mas bien eso se resuelve en producerparents y peoplehavecontacinfo y así
@@ -32,4 +32,5 @@
 - [X] No es multi idioma
 - [X] No veo regiones
 - [X] El whichparty tampoco hace falta, evitemos ese tipo de genericsids, eso me lo puede decir los FKs junto con el action
+- [X] En companies el bit de islocal no parece tener sentido, i mean no debería diferenciarse no causa nada
 ## Nuevas cosas del caso #3
