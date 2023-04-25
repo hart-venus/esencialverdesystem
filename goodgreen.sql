@@ -242,7 +242,6 @@ DROP TABLE IF EXISTS collection_log;
 CREATE TABLE collection_log (
     collection_log_id INT NOT NULL IDENTITY(1,1),
     collection_point_id INT NOT NULL,
-    which_party tinyint NOT NULL, -- 0: company, 1: producer, 2: fleet
     fleet_id INT NULL,
     company_id INT NULL,
     action tinyint NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: checkup
@@ -307,7 +306,6 @@ CREATE TABLE contracts_have_certificates (
 DROP TABLE IF EXISTS schedule_log;
 CREATE TABLE schedule_log (
     schedule_log_id INT NOT NULL IDENTITY(1,1),
-    which_party tinyint NOT NULL, -- 0: company, 1: producer, 2: fleet
     fleet_id INT NULL,
     company_id INT NULL,
     producer_id INT NULL,
@@ -374,7 +372,6 @@ CREATE TABLE recycling_contracts (
 DROP TABLE IF EXISTS percentages;
 CREATE TABLE percentages (
     percentage_id INT NOT NULL IDENTITY(1,1),
-    which_party tinyint NOT NULL, -- 0: company, 1: producer, 2: fleet, 3: other
     fleet_id INT NULL,
     company_id INT NULL,
     producer_id INT NULL,

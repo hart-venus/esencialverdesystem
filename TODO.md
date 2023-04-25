@@ -11,7 +11,7 @@
 - [ ] Están haciendo lo que mencionamos en clase que iba a estar casi imposible y es planificar los recipientes que se van a usar en una recolección
 - [ ] Supongo que en general companyid puede ser null pues se refiere a la compañía que recoge el producto? O tienen alguna forma de sin importar la forma siempre exista un company
 - [ ] La frecuencia  no puede ser un varchar, tienen que haber datos que permita a la base de datos estimar bien cuando van a suceder las cosas, un texto no nos sirve para eso
-- [ ] El whichparty tampoco hace falta, evitemos ese tipo de genericsids, eso me lo puede decir los FKs junto con el action
+
 - [ ] En companies el bit de islocal no parece tener sentido, i mean no debería diferenciarse no causa nada
 - [ ] Contactinfo no está sirviendo de nada
 - [ ] Esta mal la relación contactinfo y confactinfohascontactinfotypes
@@ -31,5 +31,5 @@
 - [X] Su modelo no permite que un país tenga más de una moneda, salvo asignandolose a otra provincia lo cual estaría mal, o bien para meter colones tendrámos que meterlo 7 veces en esu modelo
 - [X] No es multi idioma
 - [X] No veo regiones
-
+- [X] El whichparty tampoco hace falta, evitemos ese tipo de genericsids, eso me lo puede decir los FKs junto con el action
 ## Nuevas cosas del caso #3
