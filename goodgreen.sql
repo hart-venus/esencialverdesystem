@@ -263,7 +263,7 @@ CREATE TABLE collection_log (
     FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id),
     FOREIGN KEY (responsible_person_id) REFERENCES people(person_id),
 );
--- service_contract with producer, schedule, price, datetime, active and expiration
+-- service_contract with producer, schedules, datetime, active and expiration
 DROP TABLE IF EXISTS service_contracts;
 CREATE TABLE service_contracts (
     service_contract_id INT NOT NULL IDENTITY(1,1),
@@ -553,38 +553,54 @@ CREATE TABLE translations (
     FOREIGN KEY (objectType_id) REFERENCES objectTypes(objectType_id)
 );
 
--- table for billing a producer
-DROP TABLE IF EXISTS billing;
-CREATE TABLE billing (
-    billing_id INT NOT NULL IDENTITY(1,1),
-    service_contract_id INT NOT NULL,
+-- Invoice table to charge producers
+DROP TABLE IF EXISTS invoices;
+CREATE TABLE invoices (
+    invoice_id INT NOT NULL IDENTITY(1,1),
     producer_id INT NOT NULL,
-    amount DECIMAL(10,3) NOT NULL,
+    invoice_number VARCHAR(255) NOT NULL,
+    invoice_date DATETIME NOT NULL,
+    invoice_due_date DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    checksum varbinary(64) NOT NULL, -- sha256(sum(values), secret)
+    invoice_amount FLOAT NOT NULL,
     currency_id INT NOT NULL,
-    datetime DATETIME NOT NULL,
-    checksum varbinary(64) NOT NULL,
-    PRIMARY KEY (billing_id),
+    PRIMARY KEY (invoice_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
-    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
+    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id),
 );
 
--- table that lets especially contaminant producers pay
--- for other producers' bills
-DROP TABLE IF EXISTS billing_payments;
-CREATE TABLE billing_payments (
-    billing_payment_id INT NOT NULL IDENTITY(1,1),
-    billing_id INT NOT NULL,
-    producer_id INT NOT NULL,
-    amount DECIMAL(10,3) NOT NULL,
-    service_contract_id INT NOT NULL,
-    datetime DATETIME NOT NULL,
-    checksum varbinary(64) NOT NULL,
-    PRIMARY KEY (billing_payment_id),
-    FOREIGN KEY (billing_id) REFERENCES billing(billing_id),
-    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
-    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id)
+
+-- Transactions table
+DROP TABLE IF EXISTS transactions;
+CREATE TABLE transactions (
+    transaction_id INT NOT NULL IDENTITY(1,1),
+    transaction_date DATETIME NOT NULL,
+    payment_amount FLOAT NOT NULL,
+    currency_id INT NOT NULL,
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    checksum varbinary(64) NOT NULL, -- sha256(sum(values), secret)
+    PRIMARY KEY (transaction_id),
+    FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id),
 );
+
+-- Payments table
+DROP TABLE IF EXISTS payments;
+CREATE TABLE payments (
+    payment_id INT NOT NULL IDENTITY(1,1),
+    transaction_id INT NOT NULL,
+    payment_date DATETIME NOT NULL,
+    producer_id INT NOT NULL,
+    invoice_id INT NOT NULL,
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    checksum varbinary(64) NOT NULL, -- sha256(sum(values), secret)
+    PRIMARY KEY (payment_id),
+    FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id),
+    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id),
+    FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
+);
+
 -- schedule_logs_have_recipient_types with expected amount of trash
 DROP TABLE IF EXISTS schedule_logs_have_recipient_types;
 CREATE TABLE schedule_logs_have_recipient_types (
@@ -673,6 +689,21 @@ CREATE TABLE processings_have_recycling_contracts (
     FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
 );
 
+-- sponsor producers per region table
+DROP TABLE IF EXISTS sponsor_producers_per_region;
+CREATE TABLE sponsor_producers_per_region (
+    sponsor_producer_per_region_id INT NOT NULL IDENTITY(1,1),
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    checksum varbinary(64) NOT NULL,
+    producer_id INT NOT NULL,
+    region_id INT NOT NULL,
+    PRIMARY KEY (sponsor_producer_per_region_id),
+    FOREIGN KEY (region_id) REFERENCES regions(region_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
+);
 
 -- sales table for products, has a location, price and datetime
 DROP TABLE IF EXISTS sales;
