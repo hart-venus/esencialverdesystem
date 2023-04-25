@@ -6,6 +6,14 @@ CREATE TABLE currencies (
     symbol VARCHAR(10) NOT NULL,
     PRIMARY KEY (currency_id),
 );
+
+-- create movement_types table
+DROP TABLE IF EXISTS movement_types;
+CREATE TABLE movement_types (
+    movement_type_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (movement_type_id)
+);
 -- currencies_dollar_exchange_rate_log
 DROP TABLE IF EXISTS currencies_dollar_exchange_rate_log;
 CREATE TABLE currencies_dollar_exchange_rate_log (
@@ -243,7 +251,7 @@ CREATE TABLE collection_log (
     collection_point_id INT NOT NULL,
     fleet_id INT NULL,
     company_id INT NULL,
-    action tinyint NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: checkup
+    movement_type_id INT NOT NULL,
     producer_id INT NULL,
     datetime DATETIME NOT NULL,
     responsible_person_id INT NOT NULL,
@@ -252,6 +260,7 @@ CREATE TABLE collection_log (
     FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (company_id) REFERENCES companies(company_id),
+    FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id),
     FOREIGN KEY (responsible_person_id) REFERENCES people(person_id),
 );
 -- service_contract with producer, schedule, price, datetime, active and expiration
@@ -312,7 +321,7 @@ CREATE TABLE schedule_log (
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     service_contract_id INT NOT NULL,
-    action tinyint NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: checkup
+    movement_type_id INT NOT NULL,
     frequency_id INT NOT NULL,
     active BIT NOT NULL DEFAULT 1,
     PRIMARY KEY (schedule_log_id),
@@ -321,7 +330,8 @@ CREATE TABLE schedule_log (
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (company_id) REFERENCES companies(company_id),
     FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
-    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id)
+    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
+    FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id)
 );
 
 -- trash types table
@@ -428,7 +438,7 @@ CREATE TABLE product_price_per_location_log (
     price FLOAT NOT NULL,
     datetime DATETIME NOT NULL,
     active BIT NOT NULL DEFAULT 1,
-    checksum varbinary(64) NOT NULL,
+    checksum varbinary(64) NOT NULL, -- sha256(sum(values), secret)
     PRIMARY KEY (product_price_per_location_log_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
@@ -466,15 +476,15 @@ CREATE TABLE recipient_log (
     recipient_id INT NOT NULL,
     recipient_status_id INT NOT NULL,
     collection_log INT NULL,
-    action tinyint NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: check cleaning
-    cleanliness BIT NOT NULL, -- 0: dirty, 1: clean
+    movement_type_id INT NOT NULL,
     location_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     weight FLOAT NULL,
     PRIMARY KEY (recipient_log_id),
     FOREIGN KEY (recipient_id) REFERENCES recipients(recipient_id),
     FOREIGN KEY (recipient_status_id) REFERENCES recipient_status(recipient_status_id),
-    FOREIGN KEY (location_id) REFERENCES locations(location_id)
+    FOREIGN KEY (location_id) REFERENCES locations(location_id),
+    FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id),
 );
 
 -- tablas de sistema
