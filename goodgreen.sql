@@ -149,7 +149,6 @@ DROP TABLE IF EXISTS companies;
 CREATE TABLE companies (
     company_id INT NOT NULL IDENTITY(1,1),
     contact_info_id INT NOT NULL,
-    is_local BIT NOT NULL,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (company_id),
     FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id),
