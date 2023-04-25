@@ -257,6 +257,10 @@ CREATE TABLE collection_log (
     producer_id INT NULL,
     datetime DATETIME NOT NULL,
     responsible_person_id INT NOT NULL,
+
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    checksum varbinary (64) NOT NULL,
     PRIMARY KEY (collection_log_id),
     FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
     FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
