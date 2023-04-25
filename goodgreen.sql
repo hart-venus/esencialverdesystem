@@ -9,7 +9,7 @@ CREATE TABLE currencies (
 -- currencies_dollar_exchange_rate_log
 DROP TABLE IF EXISTS currencies_dollar_exchange_rate_log;
 CREATE TABLE currencies_dollar_exchange_rate_log (
-    currency_dollar_exchange_rate_log_id INT NOT NULL IDENTITY(1,1),
+    currency_dollar_exchange_rate_log_id BIGINT NOT NULL IDENTITY(1,1),
     currency_id INT NOT NULL,
     exchange_rate DECIMAL(12,4) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
@@ -239,7 +239,7 @@ CREATE TABLE people_have_contact_info (
 -- collection_log table with collection_point and fleet, company or producer, and datetime
 DROP TABLE IF EXISTS collection_log;
 CREATE TABLE collection_log (
-    collection_log_id INT NOT NULL IDENTITY(1,1),
+    collection_log_id BIGINT NOT NULL IDENTITY(1,1),
     collection_point_id INT NOT NULL,
     fleet_id INT NULL,
     company_id INT NULL,
@@ -259,11 +259,13 @@ DROP TABLE IF EXISTS service_contracts;
 CREATE TABLE service_contracts (
     service_contract_id INT NOT NULL IDENTITY(1,1),
     producer_id INT NOT NULL,
+    service_contact_info INT NOT NULL,
     currency_id INT NOT NULL,
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     active BIT NOT NULL DEFAULT 1,
     PRIMARY KEY (service_contract_id),
+    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
@@ -284,21 +286,12 @@ DROP TABLE IF EXISTS certificates;
 CREATE TABLE certificates (
     certificate_id INT NOT NULL IDENTITY(1,1),
     producer_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL,
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     PRIMARY KEY (certificate_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
-);
-
-
--- contracts have certificates table
-DROP TABLE IF EXISTS contracts_have_certificates;
-CREATE TABLE contracts_have_certificates (
-    service_contract_id INT NOT NULL,
-    certificate_id INT NOT NULL,
-    PRIMARY KEY (service_contract_id, certificate_id),
-    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
-    FOREIGN KEY (certificate_id) REFERENCES certificates(certificate_id)
 );
 
 -- frequency
@@ -311,7 +304,7 @@ CREATE TABLE frequencies (
 -- a schedule_log for a pickup or dropoff with datetime, frequency, and collection or dropoff point
 DROP TABLE IF EXISTS schedule_log;
 CREATE TABLE schedule_log (
-    schedule_log_id INT NOT NULL IDENTITY(1,1),
+    schedule_log_id BIGINT NOT NULL IDENTITY(1,1),
     fleet_id INT NULL,
     company_id INT NULL,
     producer_id INT NULL,
@@ -342,13 +335,37 @@ CREATE TABLE trash_types (
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
 
+-- recipient_brands table
+DROP TABLE IF EXISTS recipient_brands;
+CREATE TABLE recipient_brands (
+    recipient_brand_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (recipient_brand_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
+);
+
+-- recipient_models table
+DROP TABLE IF EXISTS recipient_models;
+CREATE TABLE recipient_models (
+    recipient_model_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    weight_capacity FLOAT NOT NULL,
+    brand_id INT NOT NULL,
+    PRIMARY KEY (recipient_model_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (brand_id) REFERENCES recipient_brands(recipient_brand_id)
+);
+
 -- recipient types table
 DROP TABLE IF EXISTS recipient_types;
 CREATE TABLE recipient_types (
     recipient_type_id INT NOT NULL IDENTITY(1,1),
     name VARCHAR(255) NOT NULL,
-    weight_capacity FLOAT NOT NULL,
+    recipient_model_id INT NOT NULL,
     PRIMARY KEY (recipient_type_id),
+    FOREIGN KEY (recipient_model_id) REFERENCES recipient_models(recipient_model_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
@@ -405,7 +422,7 @@ CREATE TABLE products (
 -- product_price_per_location_log
 DROP TABLE IF EXISTS product_price_per_location_log;
 CREATE TABLE product_price_per_location_log (
-    product_price_per_location_log_id INT NOT NULL IDENTITY(1,1),
+    product_price_per_location_log_id BIGINT NOT NULL IDENTITY(1,1),
     product_id INT NOT NULL,
     location_id INT NOT NULL,
     price FLOAT NOT NULL,
@@ -419,32 +436,44 @@ CREATE TABLE product_price_per_location_log (
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
 
+DROP TABLE IF EXISTS recipient_status
+CREATE TABLE recipient_status (
+    recipient_status_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (recipient_status_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
+);
+
 -- recipient with type
 DROP TABLE IF EXISTS recipients;
 CREATE TABLE recipients (
     recipient_id INT NOT NULL IDENTITY(1,1),
     recipient_type_id INT NOT NULL,
     producer_id INT NOT NULL,
-    cleanliness BIT NOT NULL, -- 0: dirty, 1: clean
     PRIMARY KEY (recipient_id),
+    recipient_status_id INT NOT NULL,
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (recipient_type_id) REFERENCES recipient_types(recipient_type_id),
+    FOREIGN KEY (recipient_status_id) REFERENCES recipient_status(recipient_status_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
 -- recipient log with datetime, recipient, location, and weight
 DROP TABLE IF EXISTS recipient_log;
 CREATE TABLE recipient_log (
-    recipient_log_id INT NOT NULL IDENTITY(1,1),
+    recipient_log_id BIGINT NOT NULL IDENTITY(1,1),
     recipient_id INT NOT NULL,
+    recipient_status_id INT NOT NULL,
     collection_log INT NULL,
     action tinyint NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: check cleaning
     cleanliness BIT NOT NULL, -- 0: dirty, 1: clean
     location_id INT NOT NULL,
     datetime DATETIME NOT NULL,
-    weight FLOAT NOT NULL,
+    weight FLOAT NULL,
     PRIMARY KEY (recipient_log_id),
     FOREIGN KEY (recipient_id) REFERENCES recipients(recipient_id),
+    FOREIGN KEY (recipient_status_id) REFERENCES recipient_status(recipient_status_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
 );
 
@@ -481,7 +510,7 @@ create table eventTypes (
 
 -- create an event log table
 create table eventlog (
-  eventlog_id INT NOT NULL IDENTITY(1,1),
+  eventlog_id BIGINT NOT NULL IDENTITY(1,1),
   level_id int not null, -- 1=error, 2=warning, 3=info
   eventdate datetime not null,
   eventtype int not null,
@@ -559,8 +588,8 @@ CREATE TABLE billing_payments (
 -- schedule_logs_have_recipients with expected amount of trash
 DROP TABLE IF EXISTS schedule_logs_have_recipients;
 CREATE TABLE schedule_logs_have_recipients (
-    schedule_log_id INT NOT NULL,
-    recipient_id INT NOT NULL,
+    schedule_log_id BIGINT NOT NULL,
+    recipient_id BIGINT NOT NULL,
     datetime DATETIME NOT NULL,
     expected_weight FLOAT NOT NULL,
     PRIMARY KEY (schedule_log_id, recipient_id),
@@ -568,14 +597,17 @@ CREATE TABLE schedule_logs_have_recipients (
     FOREIGN KEY (recipient_id) REFERENCES recipients(recipient_id)
 );
 
--- carbon_footprint_score per producer and datetime
-DROP TABLE IF EXISTS carbon_footprint_score;
-CREATE TABLE carbon_footprint_score (
-    carbon_footprint_score_id INT NOT NULL IDENTITY(1,1),
+
+DROP TABLE IF EXISTS carbon_footprint_log;
+CREATE TABLE carbon_footprint_log (
+    carbon_footprint_log_id BIGINT NOT NULL IDENTITY(1,1),
     producer_id INT NOT NULL,
-    datetime DATETIME NOT NULL,
+    created_at DATETIME NOT NULL,
+    checksum varbinary(64) NOT NULL,
+    active BIT NOT NULL DEFAULT 1,
+
     score FLOAT NOT NULL,
-    PRIMARY KEY (carbon_footprint_score_id),
+    PRIMARY KEY (carbon_footprint_log_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
 );
 
@@ -618,7 +650,7 @@ CREATE TABLE processing_have_trash_types (
 -- processing_have_trash_types_price_per_kg_log table
 DROP TABLE IF EXISTS processing_have_trash_types_price_per_kg_log;
 CREATE TABLE processing_have_trash_types_price_per_kg_log (
-    processing_have_trash_types_price_per_kg_log_id INT NOT NULL IDENTITY(1,1),
+    processing_have_trash_types_price_per_kg_log_id BIGINT NOT NULL IDENTITY(1,1),
     processing_id INT NOT NULL,
     trash_type_id INT NOT NULL,
     currency_id INT NOT NULL,
