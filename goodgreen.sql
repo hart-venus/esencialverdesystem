@@ -78,16 +78,6 @@ CREATE TABLE contact_info_types (
     PRIMARY KEY (contact_info_type_id)
 );
 
--- create contact_info table
-DROP TABLE IF EXISTS contact_info;
-CREATE TABLE contact_info (
-    contact_info_id INT NOT NULL IDENTITY(1,1),
-    PRIMARY KEY (contact_info_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    checksum varbinary(64) NOT NULL
-);
-
 -- create region table with id and name
 DROP TABLE IF EXISTS regions;
 CREATE TABLE regions (
@@ -112,58 +102,81 @@ CREATE TABLE region_areas (
     FOREIGN KEY (country_id) REFERENCES countries(country_id)
 );
 
--- create contact_info_has_contact_info_types table
-DROP TABLE IF EXISTS contact_info_has_contact_info_types;
-CREATE TABLE contact_info_has_contact_info_types (
-    contact_info_id INT NOT NULL,
+-- create people_have_contact_info_types table with person_id and contact_info_type_id, along with value
+DROP TABLE IF EXISTS people_have_contact_info_types;
+CREATE TABLE people_have_contact_info_types (
+    person_id INT NOT NULL,
     contact_info_type_id INT NOT NULL,
     value VARCHAR(255) NOT NULL,
-    PRIMARY KEY (contact_info_id, contact_info_type_id),
-    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id),
-    FOREIGN KEY (contact_info_type_id) REFERENCES contact_info_types(contact_info_type_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    checksum varbinary(64) NOT NULL
+    PRIMARY KEY (person_id, contact_info_type_id),
+    FOREIGN KEY (person_id) REFERENCES people(person_id),
+    FOREIGN KEY (contact_info_type_id) REFERENCES contact_info_types(contact_info_type_id)
 );
 
 -- create a producer_parent table with contact_info
 DROP TABLE IF EXISTS producer_parents; -- big companies like kfc, mcdonalds, etc
 CREATE TABLE producer_parents (
     producer_parent_id INT NOT NULL IDENTITY(1,1),
-    contact_info_id INT NOT NULL,
+
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (producer_parent_id),
-    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id)
 );
+-- producer_parents_have_people
+DROP TABLE IF EXISTS producer_parents_have_people;
+CREATE TABLE producer_parents_have_people (
+    producer_parent_id INT NOT NULL,
+    person_id INT NOT NULL,
+    PRIMARY KEY (producer_parent_id, person_id),
+    FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id),
+    FOREIGN KEY (person_id) REFERENCES people(person_id)
+);
+
 
 -- create a producer table with contact_info and producer_parents
 DROP TABLE IF EXISTS producers; -- single establishments like a kfc, mcdonalds, etc
 CREATE TABLE producers (
     producer_id INT NOT NULL IDENTITY(1,1),
-    contact_info_id INT NOT NULL,
     producer_parent_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (producer_id),
-    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id),
     FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     active BIT NOT NULL DEFAULT 1
 );
 
+-- producers_have_people
+DROP TABLE IF EXISTS producers_have_people;
+CREATE TABLE producers_have_people (
+    producer_id INT NOT NULL,
+    person_id INT NOT NULL,
+    PRIMARY KEY (producer_id, person_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
+    FOREIGN KEY (person_id) REFERENCES people(person_id)
+);
+
+
 -- empresas regionales (grandes) y locales (pequeñas) que recolectan basura
 -- company table (no parent company, local or regional)
 DROP TABLE IF EXISTS companies;
 CREATE TABLE companies (
     company_id INT NOT NULL IDENTITY(1,1),
-    contact_info_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (company_id),
-    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     active BIT NOT NULL DEFAULT 1
 );
+-- companies have people
+DROP TABLE IF EXISTS companies_have_people;
+CREATE TABLE companies_have_people (
+    company_id INT NOT NULL,
+    person_id INT NOT NULL,
+    PRIMARY KEY (company_id, person_id),
+    FOREIGN KEY (company_id) REFERENCES companies(company_id),
+    FOREIGN KEY (person_id) REFERENCES people(person_id)
+);
+
 
 -- companies have regions
 DROP TABLE IF EXISTS companies_have_regions;
@@ -197,11 +210,9 @@ CREATE TABLE collection_points (
     name VARCHAR(255) NOT NULL,
     producer_id INT NULL,
     company_id INT NULL,
-    contact_info_id INT NOT NULL,
     is_dropoff BIT NOT NULL, -- 0: pickup, 1: dropoff
     PRIMARY KEY (collection_point_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
-    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (company_id) REFERENCES companies(company_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
@@ -234,15 +245,6 @@ CREATE TABLE companies_have_people (
     FOREIGN KEY (company_id) REFERENCES companies(company_id),
     FOREIGN KEY (person_id) REFERENCES people(person_id)
 );
--- people_have_contact_info table
-DROP TABLE IF EXISTS people_have_contact_info;
-CREATE TABLE people_have_contact_info (
-    person_id INT NOT NULL,
-    contact_info_id INT NOT NULL,
-    PRIMARY KEY (person_id, contact_info_id),
-    FOREIGN KEY (person_id) REFERENCES people(person_id),
-    FOREIGN KEY (contact_info_id) REFERENCES contact_info(contact_info_id)
-);
 
 -- collection_log table with collection_point and fleet, company or producer, and datetime
 DROP TABLE IF EXISTS collection_log;
@@ -268,17 +270,17 @@ DROP TABLE IF EXISTS service_contracts;
 CREATE TABLE service_contracts (
     service_contract_id INT NOT NULL IDENTITY(1,1),
     producer_id INT NOT NULL,
-    service_contact_info INT NOT NULL,
+
     currency_id INT NOT NULL,
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     active BIT NOT NULL DEFAULT 1,
     PRIMARY KEY (service_contract_id),
-    FOREIGN KEY (service_contact_info) REFERENCES contact_info(contact_info_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
+
 
 -- certificates table with datetime, and expiration
 DROP TABLE IF EXISTS certificates;
@@ -695,12 +697,16 @@ CREATE TABLE sponsor_producers_per_region (
     sponsor_producer_per_region_id INT NOT NULL IDENTITY(1,1),
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
+    service_contract_id INT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     checksum varbinary(64) NOT NULL,
+    active BIT NOT NULL DEFAULT 1,
+    percentage FLOAT NOT NULL,
     producer_id INT NOT NULL,
     region_id INT NOT NULL,
     PRIMARY KEY (sponsor_producer_per_region_id),
+    FOREIGN KEY (service_contract_id ) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (region_id) REFERENCES regions(region_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
 );
