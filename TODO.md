@@ -10,8 +10,6 @@
 - [ ] Pongamole marca el tipo de recipiente
 - [ ] Están haciendo lo que mencionamos en clase que iba a estar casi imposible y es planificar los recipientes que se van a usar en una recolección
 - [ ] Supongo que en general companyid puede ser null pues se refiere a la compañía que recoge el producto? O tienen alguna forma de sin importar la forma siempre exista un company
-- [ ] La frecuencia  no puede ser un varchar, tienen que haber datos que permita a la base de datos estimar bien cuando van a suceder las cosas, un texto no nos sirve para eso
-
 
 - [ ] Contactinfo no está sirviendo de nada
 - [ ] Esta mal la relación contactinfo y confactinfohascontactinfotypes
@@ -33,4 +31,5 @@
 - [X] No veo regiones
 - [X] El whichparty tampoco hace falta, evitemos ese tipo de genericsids, eso me lo puede decir los FKs junto con el action
 - [X] En companies el bit de islocal no parece tener sentido, i mean no debería diferenciarse no causa nada
+- [X] La frecuencia  no puede ser un varchar, tienen que haber datos que permita a la base de datos estimar bien cuando van a suceder las cosas, un texto no nos sirve para eso
 ## Nuevas cosas del caso #3

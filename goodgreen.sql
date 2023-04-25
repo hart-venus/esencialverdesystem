@@ -301,6 +301,13 @@ CREATE TABLE contracts_have_certificates (
     FOREIGN KEY (certificate_id) REFERENCES certificates(certificate_id)
 );
 
+-- frequency
+DROP TABLE IF EXISTS frequencies;
+CREATE TABLE frequencies (
+    frequency_id INT NOT NULL IDENTITY(1,1),
+    frequency VARCHAR(255) NOT NULL,
+    PRIMARY KEY (frequency_id)
+);
 -- a schedule_log for a pickup or dropoff with datetime, frequency, and collection or dropoff point
 DROP TABLE IF EXISTS schedule_log;
 CREATE TABLE schedule_log (
@@ -313,10 +320,11 @@ CREATE TABLE schedule_log (
     end_date DATETIME NOT NULL,
     service_contract_id INT NOT NULL,
     action tinyint NOT NULL, -- 0: pickup, 1: dropoff, 2: cleaning, 3: checkup
-    frequency VARCHAR(255) NOT NULL,
+    frequency_id INT NOT NULL,
     active BIT NOT NULL DEFAULT 1,
     PRIMARY KEY (schedule_log_id),
     FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
+    FOREGIN KEY (frequency_id) REFERENCES frequencies(frequency_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (company_id) REFERENCES companies(company_id),
     FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
