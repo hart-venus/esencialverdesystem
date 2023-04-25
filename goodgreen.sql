@@ -429,31 +429,80 @@ CREATE TABLE recipient_log (
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
 );
 
--- table for languages
+-- tablas de sistema
+
+-- create a sources table
+create table sources (
+  source_id int not null IDENTITY(1,1),
+  name varchar(20) not null,
+  primary key (source_id)
+);
+
+-- create a levels table
+create table levels (
+  level_id int not null IDENTITY(1,1),
+  name varchar(20) not null, -- 1=error, 2=warning, 3=info
+  primary key (level_id),
+);
+
+-- create objectTypes table
+create table objectTypes (
+  objectType_id bigint not null IDENTITY(1,1),
+  name varchar(20) not null,
+  primary key (objectType_id),
+
+);
+
+-- create eventTypes table
+create table eventTypes (
+  eventType_id int not null IDENTITY(1,1),
+  name varchar(20) not null,
+  primary key (eventType_id),
+);
+
+-- create an event log table
+create table eventlog (
+  eventlog_id INT NOT NULL IDENTITY(1,1),
+  level_id int not null, -- 1=error, 2=warning, 3=info
+  eventdate datetime not null,
+  eventtype int not null,
+  source_id int not null,
+  checksum varbinary(32) not null, -- checksum of the event data
+  username varchar(20) not null,
+  referenceId1 bigint not null,
+  referenceId2 bigint not null,
+  value1 varchar(60) not null,
+  value2 varchar(60) not null,
+  primary key (eventlog_id),
+  FOREIGN KEY (source_id) REFERENCES sources(source_id),
+  FOREIGN KEY (level_id) REFERENCES levels(level_id),
+  FOREIGN KEY (referenceId1) REFERENCES objectTypes(objectType_id),
+  FOREIGN KEY (referenceId2) REFERENCES objectTypes(objectType_id),
+  FOREIGN KEY (eventtype) REFERENCES eventTypes(eventtype_id)
+);
+
+
+-- feedback: hacerlo multi-idioma
 DROP TABLE IF EXISTS languages;
 CREATE TABLE languages (
     language_id INT NOT NULL IDENTITY(1,1),
     name VARCHAR(255) NOT NULL,
+    code VARCHAR(10) NOT NULL,
     PRIMARY KEY (language_id)
 );
 
--- table for settings
-DROP TABLE IF EXISTS settings;
-CREATE TABLE settings (
-    setting_id INT NOT NULL IDENTITY(1,1),
-    description VARCHAR(255) NOT NULL,
-    PRIMARY KEY (setting_id),
-);
-
--- table for settings_have_languages
-DROP TABLE IF EXISTS settings_have_languages;
-CREATE TABLE settings_have_languages (
-    setting_id INT NOT NULL,
+DROP TABLE IF EXISTS translations;
+CREATE TABLE translations (
+    translation_id INT NOT NULL IDENTITY(1,1),
+    label VARCHAR(255) NOT NULL,
+    reference_id BIGINT NOT NULL,
+    post_time DATETIME NOT NULL,
+    active BIT NOT NULL DEFAULT 1,
     language_id INT NOT NULL,
-    value VARCHAR(255) NOT NULL,
-    PRIMARY KEY (setting_id, language_id),
-    FOREIGN KEY (setting_id) REFERENCES settings(setting_id),
-    FOREIGN KEY (language_id) REFERENCES languages(language_id)
+    objectType_id INT NOT NULL,
+    PRIMARY KEY (translation_id),
+    FOREIGN KEY (language_id) REFERENCES languages(language_id),
+    FOREIGN KEY (objectType_id) REFERENCES objectTypes(objectType_id)
 );
 
 -- table for billing a producer
