@@ -397,6 +397,50 @@ CREATE TABLE recycling_contracts (
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id)
 );
 
+-- materials table
+DROP TABLE IF EXISTS materials;
+CREATE TABLE materials (
+    material_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (material_id),
+);
+
+-- materialsXproducts table
+DROP TABLE IF EXISTS materialsXproducts;
+CREATE TABLE materialsXproducts (
+    materialsXproducts_id INT NOT NULL IDENTITY(1,1),
+    material_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity FLOAT NOT NULL,
+    measure_id INT NOT NULL,
+    PRIMARY KEY (materialsXproducts_id),
+    FOREIGN KEY (material_id) REFERENCES materials(material_id),
+    FOREIGN KEY (measure_id) REFERENCES measures(measure_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+-- measure table
+DROP TABLE IF EXISTS measures;
+CREATE TABLE measures (
+    measure_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (measure_id),
+);
+
+-- products recycled table
+DROP TABLE IF EXISTS produced_products_log;
+CREATE TABLE produced_products_log (
+    produced_products_log_id INT NOT NULL IDENTITY(1,1),
+    product_id INT NOT NULL,
+    quantity FLOAT NOT NULL,
+    measure_id INT NOT NULL,
+    recycling_contract_id INT NOT NULL,
+    PRIMARY KEY (produced_products_log_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    FOREIGN KEY (measure_id) REFERENCES measures(measure_id),
+    FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
+);
+
 -- percentages table
 DROP TABLE IF EXISTS percentages;
 CREATE TABLE percentages (
@@ -674,3 +718,4 @@ CREATE TABLE sales (
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
+
