@@ -246,15 +246,13 @@ CREATE TABLE companies_have_people (
     FOREIGN KEY (person_id) REFERENCES people(person_id)
 );
 
--- collection_log table with collection_point and fleet, company or producer, and datetime
+-- collection_log table
 DROP TABLE IF EXISTS collection_log;
 CREATE TABLE collection_log (
     collection_log_id BIGINT NOT NULL IDENTITY(1,1),
     collection_point_id INT NOT NULL,
-    fleet_id INT NULL,
-    company_id INT NULL,
     movement_type_id INT NOT NULL,
-    producer_id INT NULL,
+    service_contract_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     responsible_person_id INT NOT NULL,
 
@@ -267,6 +265,7 @@ CREATE TABLE collection_log (
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (company_id) REFERENCES companies(company_id),
     FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id),
+    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (responsible_person_id) REFERENCES people(person_id),
 );
 -- service_contract with producer, schedules, datetime, active and expiration
@@ -639,60 +638,6 @@ CREATE TABLE certificates_have_trash_types (
     PRIMARY KEY (certificate_id, trash_type_id),
     FOREIGN KEY (certificate_id) REFERENCES certificates(certificate_id),
     FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
-);
--- processing table with a price per kg, a name
--- and trash types
-DROP TABLE IF EXISTS processing;
-CREATE TABLE processing (
-    processing_id INT NOT NULL IDENTITY(1,1),
-    name VARCHAR(255) NOT NULL,
-    location_id INT NOT NULL, -- processing location, different locations have different processing units
-    PRIMARY KEY (processing_id),
-    product_id INT NOT NULL, -- product that is produced, different processing units produce different products
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    FOREIGN KEY (location_id) REFERENCES locations(location_id),
-    FOREIGN KEY (product_id) REFERENCES products(product_id)
-);
-
--- processing_have_trash_types table
-DROP TABLE IF EXISTS processing_have_trash_types;
-CREATE TABLE processing_have_trash_types (
-    processing_id INT NOT NULL,
-    trash_type_id INT NOT NULL,
-    currency_id INT NOT NULL,
-    kgs_recycled FLOAT NOT NULL, -- how much is recycled per kg of trash
-    PRIMARY KEY (processing_id, trash_type_id),
-    FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
-    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
-);
--- processing_have_trash_types_price_per_kg_log table
-DROP TABLE IF EXISTS processing_have_trash_types_price_per_kg_log;
-CREATE TABLE processing_have_trash_types_price_per_kg_log (
-    processing_have_trash_types_price_per_kg_log_id BIGINT NOT NULL IDENTITY(1,1),
-    processing_id INT NOT NULL,
-    trash_type_id INT NOT NULL,
-    currency_id INT NOT NULL,
-    price_per_kg FLOAT NOT NULL,
-    datetime DATETIME NOT NULL,
-    active BIT NOT NULL DEFAULT 1,
-    checksum varbinary(64) NOT NULL,
-    PRIMARY KEY (processing_have_trash_types_price_per_kg_log_id),
-    FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
-    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE()
-);
--- processings_have_recycling_contracts table
-DROP TABLE IF EXISTS processings_have_recycling_contracts;
-CREATE TABLE processings_have_recycling_contracts (
-    processing_id INT NOT NULL,
-    recycling_contract_id INT NOT NULL,
-    PRIMARY KEY (processing_id, recycling_contract_id),
-    FOREIGN KEY (processing_id) REFERENCES processing(processing_id),
-    FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
 );
 
 -- sponsor producers per region table
