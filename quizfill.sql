@@ -34,10 +34,10 @@ VALUES ('North America'), ('South America'), ('Europe'), ('Asia');
 
 -- Insert data into the "companies_have_regions" table
 INSERT INTO companies_have_regions (company_id, region_id)
-VALUES (1, 1), (2, 1), (3, 1), (4, 1), (5, 1),
-       (1, 2), (2, 2), (3, 2), (4, 2), (5, 2),
-       (1, 3), (2, 3), (3, 3), (4, 3), (5, 3),
-       (1, 4), (2, 4), (3, 4), (4, 4), (5, 4);
+VALUES (1, 1), (2, 1),
+       (3, 2), (4, 2), (5, 2),
+       (1, 3), (3, 3), (5, 3),
+       (1, 4), (4, 4), (5, 4);
 
 -- Insert data into the "region_areas" table
 INSERT INTO region_areas (region_id, country_id)
