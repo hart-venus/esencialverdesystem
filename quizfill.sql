@@ -4,7 +4,7 @@ BEGIN
 -- Insert data into the "currencies" table
 INSERT INTO currencies (name, symbol)
 VALUES ('colon', 'C'),
-	   ('dolar estadounidense', '$'), 
+	   ('dolar estadounidense', '$'),
 	   ('euro', 'E'),
 	   ('quesomoneda', 'q'),
 	   ('rupia', 'R');
@@ -27,5 +27,17 @@ VALUES ('Widget', 1, 10.5, '2022-01-01', '2022-01-01'),
        ('Thingamajig', 3, 7.8, '2022-01-01', '2022-01-01'),
        ('Doohickey', 4, 3.6, '2022-01-01', '2022-01-01'),
        ('Whatchamacallit', 5, 2.4, '2022-01-01', '2022-01-01');
+
+-- Insert data into the "regions" table
+INSERT INTO regions (name)
+VALUES ('North America'), ('South America'), ('Europe'), ('Asia');
+
+-- Insert data into the "companies_have_regions" table
+INSERT INTO companies_have_regions (company_id, region_id)
+VALUES (1, 1), (2, 1), (3, 1), (4, 1), (5, 1),
+       (1, 2), (2, 2), (3, 2), (4, 2), (5, 2),
+       (1, 3), (2, 3), (3, 3), (4, 3), (5, 3),
+       (1, 4), (2, 4), (3, 4), (4, 4), (5, 4);
+
 
 END;
