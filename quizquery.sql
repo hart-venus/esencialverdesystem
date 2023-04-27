@@ -1,7 +1,16 @@
--- Query to select all companies per full country
-SELECT c.name AS company, co.name AS country
+-- a. consulta original
+
+SELECT c.name AS company, r.name AS region
 FROM companies AS c
-INNER JOIN region_areas AS ra ON ra.region_id = chr.region_id
-INNER JOIN countries AS co ON co.country_id = ra.country_id
-INNER JOIN companies_have_regions AS chr ON chr.company_id = c.id
-WHERE co.company_id = 1;
+JOIN companies_have_regions AS chr ON c.company_id = chr.company_id
+JOIN regions AS r ON chr.region_id = r.region_id;
+
+-- c. reescribir como CTE
+
+WITH company_regions AS (
+    SELECT c.name AS company, r.name AS region
+    FROM companies AS c
+    JOIN companies_have_regions AS chr ON c.company_id = chr.company_id
+    JOIN regions AS r ON chr.region_id = r.region_id
+)
+SELECT * FROM company_regions;
