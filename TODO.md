@@ -2,7 +2,7 @@
 ---
 ## Nuevas cosas del caso #3
 - [ ] Rellenar base de datos
-- [ ] Hacer query de 4 joins
+- [X] Hacer query de 4 joins
 - [ ] Revisar optimización vista dinámica vs indexada
 - [ ] Realizar MEGA QUERY
 - [ ] norma de MEGA QUERY
