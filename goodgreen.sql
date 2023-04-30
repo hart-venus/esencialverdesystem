@@ -306,10 +306,6 @@ CREATE TABLE companies_have_regions (
     active BIT NOT NULL DEFAULT 1
 );
 
-
-
-
-
 -- producers_have_people table
 DROP TABLE IF EXISTS producers_have_people;
 CREATE TABLE producers_have_people (
@@ -467,7 +463,29 @@ CREATE TABLE materialsXproducts (
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
+-- processing_cost_per_waste_type table
+DROP TABLE IF EXISTS processing_cost_per_waste_type;
+CREATE TABLE processing_cost_per_waste_type (
+    processing_cost_per_waste_type_id INT NOT NULL IDENTITY(1,1),
+    trash_type_id INT NOT NULL,
+    cost FLOAT NOT NULL,
+    recycling_contract_id INT NOT NULL,
+    PRIMARY KEY (processing_cost_per_waste_type_id),
+    FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
+);
 
+-- materialXwaste_type table
+DROP TABLE IF EXISTS materialXwaste_type;
+CREATE TABLE materialXwaste_type (
+    materialXwaste_type_id INT NOT NULL IDENTITY(1,1),
+    material_id INT NOT NULL,
+    trash_type_id INT NOT NULL,
+    kg_conversion FLOAT NOT NULL,
+    PRIMARY KEY (materialXwaste_type_id),
+    FOREIGN KEY (material_id) REFERENCES materials(material_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
+);
 
 -- products recycled table
 DROP TABLE IF EXISTS produced_products_log;
@@ -740,11 +758,13 @@ CREATE TABLE sales (
     product_id INT NOT NULL,
     location_id INT NOT NULL,
     currency_id INT NOT NULL,
+    recycling_contract_id INT NOT NULL,
     price DECIMAL(10,3) NOT NULL,
     datetime DATETIME NOT NULL,
     PRIMARY KEY (sale_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
+    FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
 
