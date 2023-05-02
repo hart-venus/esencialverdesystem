@@ -90,6 +90,17 @@ CREATE TABLE cars (
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     active BIT NOT NULL DEFAULT 1
 );
+-- trash types table
+DROP TABLE IF EXISTS trash_types;
+CREATE TABLE trash_types (
+    trash_type_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    is_recyclable BIT NOT NULL,
+    PRIMARY KEY (trash_type_id),
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME NOT NULL DEFAULT GETDATE()
+);
+
 -- cars_have_trash_types table
 DROP TABLE IF EXISTS cars_have_trash_types;
 CREATE TABLE cars_have_trash_types (
@@ -372,16 +383,7 @@ CREATE TABLE certificates (
 
 
 
--- trash types table
-DROP TABLE IF EXISTS trash_types;
-CREATE TABLE trash_types (
-    trash_type_id INT NOT NULL IDENTITY(1,1),
-    name VARCHAR(255) NOT NULL,
-    is_recyclable BIT NOT NULL,
-    PRIMARY KEY (trash_type_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE()
-);
+
 
 -- recipient_brands table
 DROP TABLE IF EXISTS recipient_brands;
