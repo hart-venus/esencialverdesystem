@@ -24,7 +24,7 @@ CREATE TABLE producer_parents (
 DROP TABLE IF EXISTS producers; -- single establishments like a kfc, mcdonalds, etc
 CREATE TABLE producers (
     producer_id INT NOT NULL IDENTITY(1,1),
-    producer_parent_id INT NOT NULL,
+    producer_parent_id INT NULL,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (producer_id),
     FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id),
