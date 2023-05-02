@@ -71,12 +71,10 @@ DROP TABLE IF EXISTS products;
 CREATE TABLE products (
     product_id INT NOT NULL IDENTITY(1,1),
     name VARCHAR(255) NOT NULL,
-    currency_id INT NOT NULL,
     kg_to_produce FLOAT NOT NULL,
     PRIMARY KEY (product_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
 
 -- esencial verde car table
