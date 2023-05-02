@@ -71,7 +71,7 @@ DROP TABLE IF EXISTS products;
 CREATE TABLE products (
     product_id INT NOT NULL IDENTITY(1,1),
     name VARCHAR(255) NOT NULL,
-    kg_to_produce FLOAT NOT NULL,
+    kg_to_produce DECIMAL(12, 4) NOT NULL,
     PRIMARY KEY (product_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
@@ -89,6 +89,15 @@ CREATE TABLE cars (
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     active BIT NOT NULL DEFAULT 1
+);
+-- cars_have_trash_types table
+DROP TABLE IF EXISTS cars_have_trash_types;
+CREATE TABLE cars_have_trash_types (
+    car_id INT NOT NULL,
+    trash_type_id INT NOT NULL,
+    PRIMARY KEY (car_id, trash_type_id),
+    FOREIGN KEY (car_id) REFERENCES cars(car_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
 );
 
 -- create movement_types table
@@ -389,7 +398,7 @@ DROP TABLE IF EXISTS recipient_models;
 CREATE TABLE recipient_models (
     recipient_model_id INT NOT NULL IDENTITY(1,1),
     name VARCHAR(255) NOT NULL,
-    weight_capacity FLOAT NOT NULL,
+    weight_capacity DECIMAL(12, 4) NOT NULL,
     brand_id INT NOT NULL,
     PRIMARY KEY (recipient_model_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
@@ -453,7 +462,7 @@ CREATE TABLE materialsXproducts (
     materialsXproducts_id INT NOT NULL IDENTITY(1,1),
     material_id INT NOT NULL,
     product_id INT NOT NULL,
-    quantity FLOAT NOT NULL,
+    quantity DECIMAL(12, 4) NOT NULL,
     measure_id INT NOT NULL,
     PRIMARY KEY (materialsXproducts_id),
     FOREIGN KEY (material_id) REFERENCES materials(material_id),
@@ -466,7 +475,7 @@ DROP TABLE IF EXISTS processing_cost_per_waste_type;
 CREATE TABLE processing_cost_per_waste_type (
     processing_cost_per_waste_type_id INT NOT NULL IDENTITY(1,1),
     trash_type_id INT NOT NULL,
-    cost FLOAT NOT NULL,
+    cost DECIMAL(12, 4) NOT NULL,
     currency_id INT NOT NULL,
     recycling_contract_id INT NOT NULL,
     PRIMARY KEY (processing_cost_per_waste_type_id),
@@ -481,7 +490,7 @@ CREATE TABLE materialXwaste_type (
     materialXwaste_type_id INT NOT NULL IDENTITY(1,1),
     material_id INT NOT NULL,
     trash_type_id INT NOT NULL,
-    kg_conversion FLOAT NOT NULL,
+    kg_conversion DECIMAL(12, 4) NOT NULL,
     PRIMARY KEY (materialXwaste_type_id),
     FOREIGN KEY (material_id) REFERENCES materials(material_id),
     FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
@@ -492,7 +501,7 @@ DROP TABLE IF EXISTS produced_products_log;
 CREATE TABLE produced_products_log (
     produced_products_log_id INT NOT NULL IDENTITY(1,1),
     product_id INT NOT NULL,
-    quantity FLOAT NOT NULL,
+    quantity DECIMAL(12, 4) NOT NULL,
     measure_id INT NOT NULL,
     recycling_contract_id INT NOT NULL,
     PRIMARY KEY (produced_products_log_id),
@@ -509,30 +518,13 @@ CREATE TABLE percentages (
     company_id INT NULL,
     producer_id INT NULL,
     name VARCHAR(255) NOT NULL,
-    percentage FLOAT NOT NULL,
+    percentage DECIMAL(12, 4) NOT NULL,
     recycling_contract_id INT NOT NULL,
     PRIMARY KEY (percentage_id),
     FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id)
 );
 
 
-
--- product_price_per_location_log
-DROP TABLE IF EXISTS product_price_per_location_log;
-CREATE TABLE product_price_per_location_log (
-    product_price_per_location_log_id BIGINT NOT NULL IDENTITY(1,1),
-    product_id INT NOT NULL,
-    location_id INT NOT NULL,
-    price FLOAT NOT NULL,
-    datetime DATETIME NOT NULL,
-    active BIT NOT NULL DEFAULT 1,
-    checksum varbinary(64) NOT NULL, -- sha256(sum(values), secret)
-    PRIMARY KEY (product_price_per_location_log_id),
-    FOREIGN KEY (product_id) REFERENCES products(product_id),
-    FOREIGN KEY (location_id) REFERENCES locations(location_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE()
-);
 
 DROP TABLE IF EXISTS recipient_status
 CREATE TABLE recipient_status (
@@ -567,7 +559,7 @@ CREATE TABLE recipient_log (
     movement_type_id INT NOT NULL,
     location_id INT NOT NULL,
     datetime DATETIME NOT NULL,
-    weight FLOAT NULL,
+    weight DECIMAL(12, 4) NULL,
     PRIMARY KEY (recipient_log_id),
     FOREIGN KEY (recipient_id) REFERENCES recipients(recipient_id),
     FOREIGN KEY (recipient_status_id) REFERENCES recipient_status(recipient_status_id),
@@ -661,7 +653,7 @@ CREATE TABLE invoices (
     invoice_due_date DATETIME NOT NULL,
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     checksum varbinary(64) NOT NULL, -- sha256(sum(values), secret)
-    invoice_amount FLOAT NOT NULL,
+    invoice_amount DECIMAL(12, 4) NOT NULL,
     currency_id INT NOT NULL,
     PRIMARY KEY (invoice_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
@@ -674,7 +666,7 @@ DROP TABLE IF EXISTS transactions;
 CREATE TABLE transactions (
     transaction_id INT NOT NULL IDENTITY(1,1),
     transaction_date DATETIME NOT NULL,
-    payment_amount FLOAT NOT NULL,
+    payment_amount DECIMAL(12, 4) NOT NULL,
     currency_id INT NOT NULL,
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     checksum varbinary(64) NOT NULL, -- sha256(sum(values), secret)
@@ -702,7 +694,7 @@ DROP TABLE IF EXISTS schedule_logs_have_recipient_types;
 CREATE TABLE schedule_logs_have_recipient_types (
     schedule_log_id BIGINT NOT NULL,
     recipient_type_id INT NOT NULL,
-    expected_amount FLOAT NOT NULL,
+    expected_amount DECIMAL(12, 4) NOT NULL,
     PRIMARY KEY (schedule_log_id, recipient_type_id),
     FOREIGN KEY (schedule_log_id) REFERENCES schedule_log(schedule_log_id),
     FOREIGN KEY (recipient_type_id) REFERENCES recipient_types(recipient_type_id)
@@ -716,7 +708,7 @@ CREATE TABLE carbon_footprint_log (
     checksum varbinary(64) NOT NULL,
     active BIT NOT NULL DEFAULT 1,
 
-    score FLOAT NOT NULL,
+    score DECIMAL(12, 4) NOT NULL,
     PRIMARY KEY (carbon_footprint_log_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
 );
@@ -742,7 +734,7 @@ CREATE TABLE sponsor_producers_per_region (
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     checksum varbinary(64) NOT NULL,
     active BIT NOT NULL DEFAULT 1,
-    percentage FLOAT NOT NULL,
+    percentage DECIMAL(12, 4) NOT NULL,
     producer_id INT NOT NULL,
     region_id INT NOT NULL,
     PRIMARY KEY (sponsor_producer_per_region_id),
@@ -751,20 +743,31 @@ CREATE TABLE sponsor_producers_per_region (
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
 );
 
+-- product_price_log
+DROP TABLE IF EXISTS product_price_log;
+CREATE TABLE product_price_log (
+    product_price_log_id INT NOT NULL IDENTITY(1,1),
+    product_id INT NOT NULL,
+    price DECIMAL(12, 4) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    checksum varbinary(64) NOT NULL,
+    currency_id INT NOT NULL,
+    active BIT NOT NULL DEFAULT 1,
+    PRIMARY KEY (product_price_log_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
+);
+
 -- sales table for products, has a location, price and datetime
 DROP TABLE IF EXISTS sales;
 CREATE TABLE sales (
     sale_id INT NOT NULL IDENTITY(1,1),
     product_id INT NOT NULL,
-    location_id INT NOT NULL,
-    currency_id INT NOT NULL,
     recycling_contract_id INT NOT NULL,
-    price DECIMAL(10,3) NOT NULL,
+    currency_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     PRIMARY KEY (sale_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id),
-    FOREIGN KEY (location_id) REFERENCES locations(location_id),
     FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
 

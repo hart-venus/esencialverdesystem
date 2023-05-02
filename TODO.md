@@ -20,3 +20,31 @@
 - sort
 - wheres primary y non primary
 - for json (hace output de json) AUTO
+
+
+## MEGA QUERY
+-> select de ventas por producto
+
+[ company 1 ] [ product 1 ] [ sale week 1 ]
+[ company 1 ] [ product 1 ] [ sale week 2 ]
+
+[ company 1 ] [ product 2 ] [ sale week 1 ]
+[ company 1 ] [ product 2 ] [ sale week 2 ]
+
+[ company 2 ] [ product 1 ] [ sale week 1 ]
+[ company 2 ] [ product 1 ] [ sale week 2 ]
+
+[ company 2 ] [ product 2 ] [ sale week 1 ]
+[ company 2 ] [ product 2 ] [ sale week 2 ]
+
+-> except/intersect:
+    intersect: locations de x compañia
+    except: locations de x compañia que no esten en y compañia
+-> aggregate: suma sum(price * dolar)
+-> group by: semana
+-> sort: tiempo desc
+-> wheres:
+    tipo de basura usada para producir el producto
+    costo de la venta no supere X
+
+-> for json: auto
