@@ -9,7 +9,7 @@
 -- Desc: Inserta pais, region y compania en las tablas respectivas, asociando
 -- el pais con la region y la compania con la region
 -----------------------------------------------------------
-CREATE PROCEDURE [dbo].[XXXXXXSP_VerboEntidad]
+CREATE PROCEDURE [dbo].[SP_LigarPais]
 	@CompanyRegionData CompanyRegionType READONLY
 AS
 BEGIN
@@ -94,13 +94,13 @@ SELECT 'Company 2', 'Region 2', 'Country 2'
 UNION ALL
 SELECT 'Company 3', 'Region 3', 'Country 3'
 
-EXEC [dbo].[XXXXXXSP_VerboEntidad] @CompanyRegionData
+EXEC [dbo].[SP_LigarPais] @CompanyRegionData
 GO
 
 
 
 -- drop the procedure
-IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[XXXXXXSP_VerboEntidad]') AND type in (N'P', N'PC'))
-DROP PROCEDURE [dbo].[XXXXXXSP_VerboEntidad]
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SP_LigarPais]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[SP_LigarPais]
 GO
 

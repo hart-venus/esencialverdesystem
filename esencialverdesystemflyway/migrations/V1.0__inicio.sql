@@ -469,10 +469,12 @@ CREATE TABLE processing_cost_per_waste_type (
     processing_cost_per_waste_type_id INT NOT NULL IDENTITY(1,1),
     trash_type_id INT NOT NULL,
     cost FLOAT NOT NULL,
+    currency_id INT NOT NULL,
     recycling_contract_id INT NOT NULL,
     PRIMARY KEY (processing_cost_per_waste_type_id),
     FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id),
-    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
+    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
 
 -- materialXwaste_type table
