@@ -89,7 +89,7 @@ products = cursor.fetchall()
 # get all recycling_contracts
 cursor.execute("SELECT recycling_contract_id FROM recycling_contracts")
 recycling_contracts = cursor.fetchall()
-sales = [ (i[0], j[0]) for i in products for j in recycling_contracts for k in range(20)]
+sales = [ (i[0], j[0]) for i in products for j in recycling_contracts for k in range(100)]
 cursor.executemany("INSERT INTO sales (product_id, recycling_contract_id) VALUES (?, ?)", sales)
 
 

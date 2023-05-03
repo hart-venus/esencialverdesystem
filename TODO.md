@@ -1,7 +1,7 @@
 # To-do
 ---
 ## Nuevas cosas del caso #3
-- [ ] Rellenar base de datos
+- [X] Rellenar base de datos
 - [X] Hacer query de 4 joins
 - [X] Revisar optimización vista dinámica vs indexada
 - [ ] Realizar MEGA QUERY
