@@ -12,7 +12,7 @@
     JOIN product_price_log ON product_price_log.product_id = products.product_id and product_price_log.active = 1
     JOIN currencies_dollar_exchange_rate_log ON currencies_dollar_exchange_rate_log.currency_id = product_price_log.currency_id
 
-    WHERE sales.datetime >= '2023-01-01' AND sales.datetime < '2024-01-01'
+    WHERE sales.datetime >= '2023-01-01' AND sales.datetime < '2024-01-01' AND sales.sale_id > 2
     GROUP BY producers.name, products.name
 )
 
@@ -33,7 +33,7 @@ EXCEPT
     JOIN currencies_dollar_exchange_rate_log ON currencies_dollar_exchange_rate_log.currency_id = product_price_log.currency_id
     JOIN carbon_footprint_log ON carbon_footprint_log.producer_id = producers.producer_id and carbon_footprint_log.active = 1
 
-    WHERE sales.datetime >= '2023-01-01' AND sales.datetime < '2024-01-01'
+    WHERE sales.datetime >= '2023-01-01' AND sales.datetime < '2024-01-01' AND sales.sale_id > 2
     AND carbon_footprint_log.score > 50
 
     GROUP BY producers.name, products.name
