@@ -760,13 +760,13 @@ CREATE TABLE product_price_log (
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
 
--- sales table for products, has a location, price and datetime
+-- sales table for products, has price and datetime
 DROP TABLE IF EXISTS sales;
 CREATE TABLE sales (
     sale_id INT NOT NULL IDENTITY(1,1),
     product_id INT NOT NULL,
     recycling_contract_id INT NOT NULL,
-    datetime DATETIME NOT NULL,
+    datetime DATETIME NOT NULL DEFAULT GETDATE(),
     PRIMARY KEY (sale_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id),
     FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id),
