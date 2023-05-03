@@ -1,6 +1,7 @@
 -- select all people in companies_have_people
 -- get contact info from people_have_contact_info_types' value field
 -- get contact info type from people_have_contact_info_types' contact_info_type_id field
+-- ojo: correr 6-7, luego 9-16, luego 18-19.
 
 IF OBJECT_ID('dbo.vw_companies_people_contact_info', 'V') IS NOT NULL
    DROP VIEW dbo.vw_companies_people_contact_info;

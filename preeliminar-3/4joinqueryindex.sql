@@ -19,3 +19,6 @@ GO
 CREATE UNIQUE CLUSTERED INDEX idx_vw_companies_people_contact_info
    ON dbo.vw_companies_people_contact_info (person, type);
 GO
+
+SET STATISTICS TIME ON;
+select * from dbo.vw_companies_people_contact_info;
