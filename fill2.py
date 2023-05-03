@@ -11,6 +11,7 @@ cursor = cnxn.cursor()
 # producers: name
 producers = [(fake.company(),) for i in range(100)]
 # 1. delete all data from table
+cursor.execute("DELETE FROM sales")
 cursor.execute("DELETE FROM carbon_footprint_log")
 cursor.execute("DELETE FROM currencies_dollar_exchange_rate_log")
 cursor.execute("DELETE FROM recycling_contracts")
@@ -25,7 +26,7 @@ cursor.executemany("INSERT INTO producers (name) VALUES (?)", producers)
 cnxn.commit()
 
 # products: name, kgs_to_produce
-products = [ (fake.company(), fake.random_int(1, 1000)) for i in range(1000)]
+products = [ (fake.company(), fake.random_int(1, 1000)) for i in range(10)]
 cursor.execute("DELETE FROM products")
 cursor.executemany("INSERT INTO products (name, kg_to_produce) VALUES (?, ?)", products)
 
@@ -64,6 +65,15 @@ recycling_contracts = [ (fake.date(), fake.date(), i[0]) for i in service_contra
 cursor.executemany("INSERT INTO recycling_contracts (valid_from, valid_to, service_contract_id) VALUES (?, ?, ?)", recycling_contracts)
 
 # sales : product_id, recycling_contract_id
+# get all products
+cursor.execute("SELECT product_id FROM products")
+products = cursor.fetchall()
+# get all recycling_contracts
+cursor.execute("SELECT recycling_contract_id FROM recycling_contracts")
+recycling_contracts = cursor.fetchall()
+sales = [ (i[0], j[0]) for i in products for j in recycling_contracts for k in range(20)]
+cursor.executemany("INSERT INTO sales (product_id, recycling_contract_id) VALUES (?, ?)", sales)
+
 
 cnxn.commit()
 
