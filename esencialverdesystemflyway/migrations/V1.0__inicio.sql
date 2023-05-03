@@ -752,7 +752,7 @@ CREATE TABLE product_price_log (
     product_id INT NOT NULL,
     price DECIMAL(12, 4) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    checksum varbinary(64) NOT NULL,
+    checksum varbinary(64) NOT NULL DEFAULT 0x00,
     currency_id INT NOT NULL,
     active BIT NOT NULL DEFAULT 1,
     PRIMARY KEY (product_price_log_id),

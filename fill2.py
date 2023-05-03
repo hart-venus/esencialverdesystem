@@ -1,5 +1,6 @@
 import pyodbc
 from faker import Faker
+import random
 
 server = 'localhost'
 database = 'esencialverdesystem'
@@ -25,6 +26,8 @@ cursor.executemany("INSERT INTO producers (name) VALUES (?)", producers)
 
 cnxn.commit()
 
+
+
 # products: name, kgs_to_produce
 products = [ (fake.company(), fake.random_int(1, 1000)) for i in range(10)]
 cursor.execute("DELETE FROM products")
@@ -34,6 +37,21 @@ cursor.executemany("INSERT INTO products (name, kg_to_produce) VALUES (?, ?)", p
 currencies = [ (fake.currency_name(), fake.currency_code()) for i in range(100)]
 cursor.execute("DELETE FROM currencies")
 cursor.executemany("INSERT INTO currencies (name, symbol) VALUES (?, ?)", currencies)
+
+
+# product_price_log : product_id, price, currency_id
+# get all products
+cursor.execute("SELECT product_id FROM products")
+products = cursor.fetchall()
+# get all currencies
+cursor.execute("SELECT currency_id FROM currencies")
+currencies = cursor.fetchall()
+
+# insert random price, random currency for each product
+product_price_log = [ (i[0], fake.random_int(1, 100), random.choice(currencies)[0]) for i in products]
+cursor.executemany("INSERT INTO product_price_log (product_id, price, currency_id) VALUES (?, ?, ?)", product_price_log)
+
+
 
 # carbon_footprint_log : producer_id, score (random between 1 and 100)
 # get all producers
