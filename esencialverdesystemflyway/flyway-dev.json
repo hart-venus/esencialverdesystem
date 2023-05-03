@@ -9,6 +9,19 @@
   "deployment": {
     "flywayConfFiles": [
       "./flyway.conf"
+    ],
+    "targetDatabases": [
+      {
+        "connectionProvider": {
+          "type": "UsernamePassword",
+          "url": "jdbc:sqlserver://localhost:1433;authentication=sqlPassword;databaseName=esencialverdesystem;encrypt=true;trustServerCertificate=true",
+          "username": "sa",
+          "password": {
+            "secretType": "DefaultSecretStore",
+            "name": "Flyway Desktop fb7df0f0-7831-42ce-a5aa-b505c8a83fdb"
+          }
+        }
+      }
     ]
   }
 }

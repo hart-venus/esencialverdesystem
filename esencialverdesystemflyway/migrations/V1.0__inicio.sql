@@ -124,15 +124,12 @@ DROP TABLE IF EXISTS service_contracts;
 CREATE TABLE service_contracts (
     service_contract_id INT NOT NULL IDENTITY(1,1),
     producer_id INT NOT NULL,
-
-    currency_id INT NOT NULL,
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     active BIT NOT NULL DEFAULT 1,
     PRIMARY KEY (service_contract_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
 
 -- currencies_dollar_exchange_rate_log
@@ -145,7 +142,7 @@ CREATE TABLE currencies_dollar_exchange_rate_log (
     start_date DATETIME NOT NULL DEFAULT GETDATE(),
     end_date DATETIME NULL,
     active BIT NOT NULL DEFAULT 1,
-    checksum varbinary(64) NOT NULL,
+    checksum varbinary(64) NOT NULL DEFAULT 0x0,
     PRIMARY KEY (currency_dollar_exchange_rate_log_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
@@ -706,8 +703,8 @@ DROP TABLE IF EXISTS carbon_footprint_log;
 CREATE TABLE carbon_footprint_log (
     carbon_footprint_log_id BIGINT NOT NULL IDENTITY(1,1),
     producer_id INT NOT NULL,
-    created_at DATETIME NOT NULL,
-    checksum varbinary(64) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    checksum varbinary(64) NOT NULL DEFAULT 0x00,
     active BIT NOT NULL DEFAULT 1,
 
     score DECIMAL(12, 4) NOT NULL,
