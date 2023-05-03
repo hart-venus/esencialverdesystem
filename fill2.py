@@ -12,6 +12,7 @@ cursor = cnxn.cursor()
 # producers: name
 producers = [(fake.company(),) for i in range(100)]
 # 1. delete all data from table
+cursor.execute("DELETE FROM product_price_log")
 cursor.execute("DELETE FROM sales")
 cursor.execute("DELETE FROM carbon_footprint_log")
 cursor.execute("DELETE FROM currencies_dollar_exchange_rate_log")
@@ -89,8 +90,10 @@ products = cursor.fetchall()
 # get all recycling_contracts
 cursor.execute("SELECT recycling_contract_id FROM recycling_contracts")
 recycling_contracts = cursor.fetchall()
-sales = [ (i[0], j[0]) for i in products for j in recycling_contracts for k in range(100)]
-cursor.executemany("INSERT INTO sales (product_id, recycling_contract_id) VALUES (?, ?)", sales)
+sales = [ (i[0], j[0]) for i in products for j in recycling_contracts]
+
+for i in range(100):
+    cursor.executemany("INSERT INTO sales (product_id, recycling_contract_id) VALUES (?, ?)", sales)
 
 
 cnxn.commit()
