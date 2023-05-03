@@ -766,7 +766,6 @@ CREATE TABLE sales (
     sale_id INT NOT NULL IDENTITY(1,1),
     product_id INT NOT NULL,
     recycling_contract_id INT NOT NULL,
-    currency_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     PRIMARY KEY (sale_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id),
