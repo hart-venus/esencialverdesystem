@@ -63,6 +63,7 @@ service_contracts = cursor.fetchall()
 recycling_contracts = [ (fake.date(), fake.date(), i[0]) for i in service_contracts]
 cursor.executemany("INSERT INTO recycling_contracts (valid_from, valid_to, service_contract_id) VALUES (?, ?, ?)", recycling_contracts)
 
+# sales : product_id, recycling_contract_id
 
 cnxn.commit()
 
