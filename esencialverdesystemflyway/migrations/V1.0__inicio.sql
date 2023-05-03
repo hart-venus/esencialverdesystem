@@ -431,7 +431,7 @@ CREATE TABLE recipient_types_have_trash_types (
 DROP TABLE IF EXISTS recycling_contracts;
 CREATE TABLE recycling_contracts (
     recycling_contract_id INT NOT NULL IDENTITY(1,1),
-    checksum varbinary(64) NOT NULL,
+    checksum varbinary(64) NOT NULL DEFAULT 0x0,
     valid_from DATETIME NOT NULL,
     valid_to DATETIME NOT NULL,
     service_contract_id INT NOT NULL,

@@ -11,6 +11,11 @@ cursor = cnxn.cursor()
 # producers: name
 producers = [(fake.company(),) for i in range(100)]
 # 1. delete all data from table
+cursor.execute("DELETE FROM carbon_footprint_log")
+cursor.execute("DELETE FROM currencies_dollar_exchange_rate_log")
+cursor.execute("DELETE FROM recycling_contracts")
+cursor.execute("DELETE FROM service_contracts")
+
 cursor.execute("DELETE FROM producers")
 print(producers)
 # 2. insert new data
@@ -34,7 +39,7 @@ cursor.executemany("INSERT INTO currencies (name, symbol) VALUES (?, ?)", curren
 cursor.execute("SELECT producer_id FROM producers")
 producers = cursor.fetchall()
 carbon_footprint_log = [ (i[0], fake.random_int(1, 100)) for i in producers]
-cursor.execute("DELETE FROM carbon_footprint_log")
+
 cursor.executemany("INSERT INTO carbon_footprint_log (producer_id, score) VALUES (?, ?)", carbon_footprint_log)
 
 # currencies_dollar_exchange_rate_log: currency_id, exchange_rate (random between 1 and 100)
@@ -42,8 +47,21 @@ cursor.executemany("INSERT INTO carbon_footprint_log (producer_id, score) VALUES
 cursor.execute("SELECT currency_id FROM currencies")
 currencies = cursor.fetchall()
 currencies_dollar_exchange_rate_log = [ (i[0], fake.random_int(1, 100)) for i in currencies]
-cursor.execute("DELETE FROM currencies_dollar_exchange_rate_log")
 cursor.executemany("INSERT INTO currencies_dollar_exchange_rate_log (currency_id, exchange_rate) VALUES (?, ?)", currencies_dollar_exchange_rate_log)
+
+# service_contracts: producer_id, start_date, end_date
+# get all producers
+cursor.execute("SELECT producer_id FROM producers")
+producers = cursor.fetchall()
+service_contracts = [ (i[0], fake.date(), fake.date()) for i in producers]
+cursor.executemany("INSERT INTO service_contracts (producer_id, start_date, end_date) VALUES (?, ?, ?)", service_contracts)
+
+# recycling_contracts: valid_from, valid_to, service_contract_id
+# get all service_contracts
+cursor.execute("SELECT service_contract_id FROM service_contracts")
+service_contracts = cursor.fetchall()
+recycling_contracts = [ (fake.date(), fake.date(), i[0]) for i in service_contracts]
+cursor.executemany("INSERT INTO recycling_contracts (valid_from, valid_to, service_contract_id) VALUES (?, ?, ?)", recycling_contracts)
 
 
 cnxn.commit()
