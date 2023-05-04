@@ -9,14 +9,6 @@
 -- Desc: Inserta pais, region y compania en las tablas respectivas, asociando
 -- el pais con la region y la compania con la region
 -----------------------------------------------------------
-DROP TYPE IF EXISTS CompanyRegionType;
-CREATE TYPE CompanyRegionType AS TABLE
-(
-    CompanyName VARCHAR(50),
-    RegionName VARCHAR(50),
-    CountryName VARCHAR(50)
-);
-
 CREATE PROCEDURE [dbo].[SP_LigarPais]
 	@CompanyRegionData CompanyRegionType READONLY
 AS

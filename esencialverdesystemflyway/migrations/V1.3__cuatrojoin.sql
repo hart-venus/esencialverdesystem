@@ -1,10 +1,6 @@
 -- select all people in companies_have_people
 -- get contact info from people_have_contact_info_types' value field
 -- get contact info type from people_have_contact_info_types' contact_info_type_id field
--- ojo: correr 6-7, luego 9-16, luego 18-19.
-
-IF OBJECT_ID('dbo.vw_companies_people_contact_info', 'V') IS NOT NULL
-   DROP VIEW dbo.vw_companies_people_contact_info;
 
 CREATE VIEW dbo.vw_companies_people_contact_info AS
 SELECT dbo.companies.name AS 'company name', dbo.people.person_id AS 'person',  dbo.contact_info_types.name AS 'type', dbo.people_have_contact_info_types.value
@@ -14,6 +10,3 @@ INNER JOIN dbo.people_have_contact_info_types ON dbo.people.person_id = dbo.peop
 INNER JOIN dbo.contact_info_types ON dbo.people_have_contact_info_types.contact_info_type_id = dbo.contact_info_types.contact_info_type_id
 INNER JOIN dbo.companies ON dbo.companies_have_people.company_id = dbo.companies.company_id
 WHERE dbo.contact_info_types.name = 'email';
-
-SET STATISTICS TIME ON;
-select * from dbo.vw_companies_people_contact_info;
