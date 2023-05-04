@@ -1,3 +1,4 @@
+SET STATISTICS TIME ON;
 (
     SELECT
     producers.name as producer,

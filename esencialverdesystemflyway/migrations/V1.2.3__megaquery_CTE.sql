@@ -1,3 +1,4 @@
+SET STATISTICS TIME ON;
 WITH SalesInfo AS (
     SELECT
         COALESCE(producers.name, 'TOTAL') as producer,

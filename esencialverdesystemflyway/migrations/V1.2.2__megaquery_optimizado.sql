@@ -1,3 +1,4 @@
+SET STATISTICS TIME ON;
 SELECT
     COALESCE(producers.name, 'TOTAL') as producer,
     COALESCE(products.name, 'TOTAL') as product,
