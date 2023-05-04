@@ -39,5 +39,5 @@ GROUP BY ROLLUP (producers.name, products.name)
 
 
 ORDER BY total_dollars DESC
-
+FOR JSON AUTO
 ;

@@ -43,4 +43,5 @@ WHERE NOT EXISTS (
 UNION ALL
 SELECT CarbonInfo.producer, CarbonInfo.product, CarbonInfo.total_dollars
 FROM CarbonInfo
-ORDER BY total_dollars DESC;
+ORDER BY total_dollars DESC
+FOR JSON AUTO;
