@@ -1,5 +1,8 @@
-CREATE VIEW megaquery AS
+CREATE FUNCTION dbo.megaQuery()
+RETURNS TABLE
+AS
 
+RETURN (
 (
     SELECT
     producers.name as producer,
@@ -42,4 +45,5 @@ EXCEPT
 )
 
 ORDER BY total_dollars DESC
-FOR JSON AUTO;
+FOR JSON AUTO
+);
