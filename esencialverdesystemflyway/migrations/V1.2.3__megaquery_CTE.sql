@@ -1,4 +1,3 @@
-CREATE VIEW megaquery_optimized_CTE AS
 WITH SalesInfo AS (
     SELECT
         COALESCE(producers.name, 'TOTAL') as producer,
