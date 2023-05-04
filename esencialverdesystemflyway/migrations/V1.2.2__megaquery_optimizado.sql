@@ -1,4 +1,3 @@
-SET STATISTICS TIME ON;
 CREATE VIEW megaquery_optimized AS
 
 SELECT
