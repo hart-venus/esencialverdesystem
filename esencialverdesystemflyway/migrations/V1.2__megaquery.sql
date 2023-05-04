@@ -1,4 +1,6 @@
 SET STATISTICS TIME ON;
+CREATE VIEW megaquery AS
+
 (
     SELECT
     producers.name as producer,

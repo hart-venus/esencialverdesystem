@@ -1,4 +1,5 @@
 SET STATISTICS TIME ON;
+CREATE VIEW megaquery_optimized AS
 
 SELECT
     COALESCE(producers.name, 'TOTAL') as producer,

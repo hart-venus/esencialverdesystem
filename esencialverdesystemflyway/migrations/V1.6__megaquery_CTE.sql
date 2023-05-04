@@ -1,6 +1,6 @@
 SET STATISTICS TIME ON;
 
-
+CREATE VIEW megaquery_optimized_CTE AS
 WITH SalesInfo AS (
     SELECT
         COALESCE(producers.name, 'TOTAL') as producer,
@@ -15,7 +15,7 @@ WITH SalesInfo AS (
     JOIN currencies_dollar_exchange_rate_log ON currencies_dollar_exchange_rate_log.currency_id = product_price_log.currency_id
     WHERE sales.datetime >= '2023-01-01' AND sales.datetime < '2024-01-01' AND sales.sale_id > 2
     GROUP BY ROLLUP (producers.name, products.name)
-), 
+),
 CarbonInfo AS (
     SELECT
 		COALESCE(producers.name, 'TOTAL') as producer,
