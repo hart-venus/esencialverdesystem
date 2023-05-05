@@ -21,6 +21,12 @@ cursor.execute("DELETE FROM contact_info_types")
 cursor.execute("DELETE FROM companies_have_people")
 cursor.execute("DELETE FROM people")
 cursor.execute("DELETE FROM companies")
+
+# 1.5 reset indexes
+cursor.execute("DBCC CHECKIDENT ('companies', RESEED, 0)")
+cursor.execute("DBCC CHECKIDENT ('people', RESEED, 0)")
+cursor.execute("DBCC CHECKIDENT ('contact_info_types', RESEED, 0)")
+
 # 2. insert new data
 cursor.executemany("INSERT INTO companies VALUES (?, ?, ?, ?)", companies)
 
@@ -45,6 +51,7 @@ cursor = cnxn.cursor()
 
 # 2. insert new data
 for i in range(1, 10001):
+    print(min((i//10)+1, 1000), i)
     cursor.execute("INSERT INTO companies_have_people VALUES (?, ?)", (min((i//10)+1, 1000), i))
 
 cnxn.commit()
