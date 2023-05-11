@@ -5,7 +5,7 @@ BEGIN
 INSERT INTO currencies (name, symbol)
 VALUES ('colon', 'C'),
 	   ('dolar estadounidense', '$'),
-	   ('euro', 'E'),
+	   ('euros', 'E'),
 	   ('quesomoneda', 'q'),
 	   ('rupia', 'R');
 -- Insert data into the "countries" table
