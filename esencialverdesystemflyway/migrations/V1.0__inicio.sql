@@ -78,12 +78,12 @@ CREATE TABLE products (
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
 );
 
--- esencial verde car table
-DROP TABLE IF EXISTS cars;
-CREATE TABLE cars (
-    car_id INT NOT NULL IDENTITY(1,1),
+-- esencial verde truck table
+DROP TABLE IF EXISTS trucks;
+CREATE TABLE trucks (
+    truck_id INT NOT NULL IDENTITY(1,1),
     fleet_id INT NOT NULL,
-    name VARCHAR(255) NOT NULL,
+    plate VARCHAR(255) NOT NULL,
     PRIMARY KEY (car_id),
     capacity DECIMAL(10,3) NOT NULL,
     FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
