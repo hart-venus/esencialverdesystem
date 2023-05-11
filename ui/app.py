@@ -1,10 +1,15 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import pyodbc
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+
+    # Si se envía el formulario
+    if request.method == 'POST':
+        form_data = request.form
+        print(form_data)
     # Establecer la cadena de conexión
     server = 'localhost'
     database = 'esencialverdesystem'
