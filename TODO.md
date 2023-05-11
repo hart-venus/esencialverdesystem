@@ -1,11 +1,10 @@
 # To-do
 ---
-## Nuevas cosas del caso #3
-- [X] Rellenar base de datos
-- [X] Hacer query de 4 joins
-- [X] Revisar optimización vista dinámica vs indexada
-- [X] Realizar MEGA QUERY
-- [X] Crear stored procedure que tome como parametro TVP
-- [X] simplificar mediante CTE la consulta de norma (MEGA QUERY)
-- [X] norma de MEGA QUERY
-- [ ] entregar repo de flyway, scripts de prueba y pdf
+## Salvar el Semestre
+- [ ] Empezar app flask
+- [ ] Hacer diseño figma o css para hacer evaluacion con rodri
+- [ ] Terminar linking de UI con MVC
+- [ ] Evaluar con rodri
+- [ ] Empezar el REST API con NODE
+- [ ] Evaluar con rodri
+- [ ] Si nos da tiempo, hacer puntos extra con ORM (ruby)
