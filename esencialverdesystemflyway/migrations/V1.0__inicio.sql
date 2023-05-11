@@ -84,7 +84,7 @@ CREATE TABLE trucks (
     truck_id INT NOT NULL IDENTITY(1,1),
     fleet_id INT NOT NULL,
     plate VARCHAR(255) NOT NULL,
-    PRIMARY KEY (car_id),
+    PRIMARY KEY (truck_id),
     capacity DECIMAL(10,3) NOT NULL,
     FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
