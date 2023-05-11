@@ -54,6 +54,7 @@ CREATE TABLE currencies (
 DROP TABLE IF EXISTS people;
 CREATE TABLE people (
     person_id INT NOT NULL IDENTITY(1,1),
+    full_name VARCHAR(255) NOT NULL,
     PRIMARY KEY (person_id)
 );
 -- esencial verde fleet table
