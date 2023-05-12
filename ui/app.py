@@ -26,14 +26,21 @@ def index():
     names = cursor.fetchall()
     cursor.execute('SELECT plate FROM fleets')
     plates = cursor.fetchall()
+    cursor.execute("SELECT name FROM collection_points WHERE is_dropoff = 1 AND active = 1")
+    collection_points_names = cursor.fetchall()
 
+    cursor.execute("SELECT name FROM trash_types")
+    trash_types = cursor.fetchall()
+
+    cursor.execute("SELECT name FROM recipient_types")
+    recipient_types = cursor.fetchall()
 
     # Cerrar la conexión
     cursor.close()
     conn.close()
 
     # Renderizar la plantilla y pasar los datos
-    return render_template('index.html', names=names, fleets=plates)
+    return render_template('index.html', names=names, recipient_types = recipient_types, trash_types=trash_types, fleets=plates, collection_points_names=collection_points_names)
 
 if __name__ == '__main__':
     app.run(debug=True)
