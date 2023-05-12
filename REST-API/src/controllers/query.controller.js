@@ -1,0 +1,1 @@
+export const getProducers = (req, res) => res.send('Producer list');

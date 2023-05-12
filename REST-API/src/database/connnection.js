@@ -12,11 +12,12 @@ const dbSettings = {
 }
 
 async function getConnection() {
-    
-    const pool = await sql.connect(dbSettings)
-    const result = await pool.request().query("SELECT * FROM dbo.currencies")
-    console.log(result);
-
+    try {
+        const pool = await sql.connect(dbSettings);
+        return pool;
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 getConnection();
