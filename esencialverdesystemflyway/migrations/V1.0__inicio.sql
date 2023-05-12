@@ -61,7 +61,8 @@ CREATE TABLE people (
 DROP TABLE IF EXISTS fleets;
 CREATE TABLE fleets (
     fleet_id INT NOT NULL IDENTITY(1,1),
-    name VARCHAR(255) NOT NULL,
+    plate VARCHAR(255) NOT NULL,
+    capacity DECIMAL(10,3) NOT NULL,
     PRIMARY KEY (fleet_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
@@ -78,19 +79,6 @@ CREATE TABLE products (
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
 );
 
--- esencial verde truck table
-DROP TABLE IF EXISTS trucks;
-CREATE TABLE trucks (
-    truck_id INT NOT NULL IDENTITY(1,1),
-    fleet_id INT NOT NULL,
-    plate VARCHAR(255) NOT NULL,
-    PRIMARY KEY (truck_id),
-    capacity DECIMAL(10,3) NOT NULL,
-    FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    active BIT NOT NULL DEFAULT 1
-);
 -- trash types table
 DROP TABLE IF EXISTS trash_types;
 CREATE TABLE trash_types (
@@ -100,16 +88,6 @@ CREATE TABLE trash_types (
     PRIMARY KEY (trash_type_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
-);
-
--- cars_have_trash_types table
-DROP TABLE IF EXISTS cars_have_trash_types;
-CREATE TABLE cars_have_trash_types (
-    car_id INT NOT NULL,
-    trash_type_id INT NOT NULL,
-    PRIMARY KEY (car_id, trash_type_id),
-    FOREIGN KEY (car_id) REFERENCES cars(car_id),
-    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
 );
 
 -- create movement_types table
@@ -353,14 +331,13 @@ CREATE TABLE collection_log (
     service_contract_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     responsible_person_id INT NOT NULL,
-    schedule_log_id BIGINT NOT NULL,
 
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     checksum varbinary (64) NOT NULL,
     PRIMARY KEY (collection_log_id),
     FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
-    FOREIGN KEY (schedule_log_id) REFERENCES schedule_log(schedule_log_id),
+
     FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (responsible_person_id) REFERENCES people(person_id),
@@ -380,11 +357,6 @@ CREATE TABLE certificates (
     PRIMARY KEY (certificate_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
 );
-
-
-
-
-
 
 -- recipient_brands table
 DROP TABLE IF EXISTS recipient_brands;

@@ -21,16 +21,19 @@ def index():
     conn = pyodbc.connect(conn_str)
     cursor = conn.cursor()
 
-    # Ejecutar la consulta
-    cursor.execute('SELECT * FROM countries')
-    rows = cursor.fetchall()
+    # Ejecutar las consultas
+    cursor.execute('SELECT full_name FROM people')
+    names = cursor.fetchall()
+    cursor.execute('SELECT plate FROM fleets')
+    plates = cursor.fetchall()
+
 
     # Cerrar la conexión
     cursor.close()
     conn.close()
 
     # Renderizar la plantilla y pasar los datos
-    return render_template('index.html', rows=rows)
+    return render_template('index.html', names=names, fleets=plates)
 
 if __name__ == '__main__':
     app.run(debug=True)
