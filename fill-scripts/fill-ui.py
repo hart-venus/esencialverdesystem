@@ -183,7 +183,7 @@ def fill():
     recipient_models = [(recipient_brand_id[0], fake.company(), random.randint(3, 50)) for recipient_brand_id in recipient_brands_ids]
     print(recipient_models)
     cursor.executemany("INSERT INTO recipient_models(brand_id, name, weight_capacity) VALUES (?, ?, ?)", recipient_models)
-    cursor.commit()
+
 
     # get ids for recipient models
     cursor.execute("SELECT recipient_model_id FROM recipient_models")
@@ -191,7 +191,9 @@ def fill():
 
     # for each recipient type, get a random recipient model
     contenedores_de_basura = [(contenedor_de_basura[0], random.choice(recipient_models_ids)[0]) for contenedor_de_basura in contenedores_de_basura]
+
     cursor.executemany("INSERT INTO recipient_types(name, recipient_model_id) VALUES (?, ?)", contenedores_de_basura)
+    cursor.commit()
 
 if __name__ == '__main__':
     cleanUp()
