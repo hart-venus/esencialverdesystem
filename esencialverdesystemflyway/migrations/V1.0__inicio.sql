@@ -102,16 +102,6 @@ CREATE TABLE trash_types (
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
 
--- cars_have_trash_types table
-DROP TABLE IF EXISTS cars_have_trash_types;
-CREATE TABLE cars_have_trash_types (
-    car_id INT NOT NULL,
-    trash_type_id INT NOT NULL,
-    PRIMARY KEY (car_id, trash_type_id),
-    FOREIGN KEY (car_id) REFERENCES cars(car_id),
-    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
-);
-
 -- create movement_types table
 DROP TABLE IF EXISTS movement_types;
 CREATE TABLE movement_types (
