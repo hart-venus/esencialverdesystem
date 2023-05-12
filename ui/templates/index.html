@@ -11,11 +11,12 @@
 
   <form action="/" method="post">
     <h2>1. Selección de Transportista</h2>
+
     <label for="transportista">Transportista:</label>
     <select id="transportista" name="transportista">
-      <option value="transportista1">Transportista 1</option>
-      <option value="transportista2">Transportista 2</option>
-      <option value="transportista3">Transportista 3</option>
+      {% for name in names %}
+        <option value="{{ name[0] }}">{{ name[0] }}</option>
+      {% endfor %}
     </select>
     <br><br>
 

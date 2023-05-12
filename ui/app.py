@@ -22,15 +22,15 @@ def index():
     cursor = conn.cursor()
 
     # Ejecutar la consulta
-    cursor.execute('SELECT * FROM countries')
-    rows = cursor.fetchall()
+    cursor.execute('SELECT full_name FROM people')
+    names = cursor.fetchall()
 
     # Cerrar la conexión
     cursor.close()
     conn.close()
 
     # Renderizar la plantilla y pasar los datos
-    return render_template('index.html', rows=rows)
+    return render_template('index.html', names=names)
 
 if __name__ == '__main__':
     app.run(debug=True)
