@@ -327,18 +327,22 @@ DROP TABLE IF EXISTS collection_log;
 CREATE TABLE collection_log (
     collection_log_id BIGINT NOT NULL IDENTITY(1,1),
     collection_point_id INT NOT NULL,
-    movement_type_id INT NOT NULL,
     service_contract_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     responsible_person_id INT NOT NULL,
+
+    fleet_id INT NULL,
+    company_id INT NULL,
+    producer_id INT NULL,
 
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     checksum varbinary (64) NOT NULL,
     PRIMARY KEY (collection_log_id),
     FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
-
-    FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id),
+    FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
+    FOREIGN KEY (company_id) REFERENCES companies(company_id),
+    FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (responsible_person_id) REFERENCES people(person_id),
 );
@@ -514,6 +518,7 @@ CREATE TABLE recipient_status (
 DROP TABLE IF EXISTS recipients;
 CREATE TABLE recipients (
     recipient_id INT NOT NULL IDENTITY(1,1),
+    trash_type_id INT NOT NULL,
     recipient_type_id INT NOT NULL,
     producer_id INT NOT NULL,
     PRIMARY KEY (recipient_id),
@@ -521,6 +526,7 @@ CREATE TABLE recipients (
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (recipient_type_id) REFERENCES recipient_types(recipient_type_id),
     FOREIGN KEY (recipient_status_id) REFERENCES recipient_status(recipient_status_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
@@ -529,16 +535,15 @@ DROP TABLE IF EXISTS recipient_log;
 CREATE TABLE recipient_log (
     recipient_log_id BIGINT NOT NULL IDENTITY(1,1),
     recipient_id INT NOT NULL,
-    recipient_status_id INT NOT NULL,
-    collection_log INT NULL,
+    recipient_status_id INT NOT NULL DEFAULT 1,
+    collection_log_id BIGINT NOT NULL,
     movement_type_id INT NOT NULL,
-    location_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     weight DECIMAL(12, 4) NULL,
     PRIMARY KEY (recipient_log_id),
+    FOREIGN KEY (collection_log_id) REFERENCES collection_log(collection_log_id),
     FOREIGN KEY (recipient_id) REFERENCES recipients(recipient_id),
     FOREIGN KEY (recipient_status_id) REFERENCES recipient_status(recipient_status_id),
-    FOREIGN KEY (location_id) REFERENCES locations(location_id),
     FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id),
 );
 

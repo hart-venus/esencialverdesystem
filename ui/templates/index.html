@@ -31,9 +31,9 @@
 
     <label for="lugar">Lugar:</label>
     <select id="lugar" name="lugar">
-      <option value="lugar1">Lugar 1</option>
-      <option value="lugar2">Lugar 2</option>
-      <option value="lugar3">Lugar 3</option>
+      {% for collection_points_name in collection_points_names %}
+        <option value="{{ collection_points_name[0] }}">{{ collection_points_name[0] }}</option>
+      {% endfor %}
     </select>
     <br><br>
 
@@ -42,17 +42,17 @@
 
       <label for="tipo_residuo">Tipo de Residuo:</label>
       <select id="tipo_residuo" name="tipo_residuo[]">
-        <option value="residuo1">Residuo 1</option>
-        <option value="residuo2">Residuo 2</option>
-        <option value="residuo3">Residuo 3</option>
+        {% for trash_type in trash_types %}
+        <option value="{{ trash_type[0] }}">{{ trash_type[0] }}</option>
+        {% endfor %}
       </select>
       <br><br>
 
       <label for="tipo_recipiente_recolectar">Tipo de Recipiente:</label>
       <select id="tipo_recipiente_recolectar" name="tipo_recipiente_recolectar[]">
-        <option value="recipiente1">Recipiente 1</option>
-        <option value="recipiente2">Recipiente 2</option>
-        <option value="recipiente3">Recipiente 3</option>
+        {% for recipient_type in recipient_types %}
+        <option value="{{ recipient_type[0] }}">{{ recipient_type[0] }}</option>
+        {% endfor %}
       </select>
       <br><br>
 
@@ -67,9 +67,9 @@
     <div class="entrega-container">
       <label for="tipo_recipiente_entregar">Tipo de Recipiente:</label>
       <select id="tipo_recipiente_entregar" name="tipo_recipiente_entregar[]">
-        <option value="recipiente1">Recipiente 1</option>
-        <option value="recipiente2">Recipiente 2</option>
-        <option value="recipiente3">Recipiente 3</option>
+        {% for recipient_type in recipient_types %}
+        <option value="{{ recipient_type[0] }}">{{ recipient_type[0] }}</option>
+        {% endfor %}
       </select>
       <br><br>
 
