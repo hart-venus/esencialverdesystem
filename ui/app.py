@@ -21,9 +21,11 @@ def index():
     conn = pyodbc.connect(conn_str)
     cursor = conn.cursor()
 
-    # Ejecutar la consulta
+    # Ejecutar las consultas
     cursor.execute('SELECT full_name FROM people')
     names = cursor.fetchall()
+
+
 
     # Cerrar la conexión
     cursor.close()

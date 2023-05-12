@@ -61,7 +61,8 @@ CREATE TABLE people (
 DROP TABLE IF EXISTS fleets;
 CREATE TABLE fleets (
     fleet_id INT NOT NULL IDENTITY(1,1),
-    name VARCHAR(255) NOT NULL,
+    plate VARCHAR(255) NOT NULL,
+    capacity DECIMAL(10,3) NOT NULL,
     PRIMARY KEY (fleet_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
@@ -78,19 +79,6 @@ CREATE TABLE products (
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
 );
 
--- esencial verde truck table
-DROP TABLE IF EXISTS trucks;
-CREATE TABLE trucks (
-    truck_id INT NOT NULL IDENTITY(1,1),
-    fleet_id INT NOT NULL,
-    plate VARCHAR(255) NOT NULL,
-    PRIMARY KEY (truck_id),
-    capacity DECIMAL(10,3) NOT NULL,
-    FOREIGN KEY (fleet_id) REFERENCES fleets(fleet_id),
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
-    active BIT NOT NULL DEFAULT 1
-);
 -- trash types table
 DROP TABLE IF EXISTS trash_types;
 CREATE TABLE trash_types (
