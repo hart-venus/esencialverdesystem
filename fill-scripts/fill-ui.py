@@ -1,6 +1,6 @@
 import pyodbc
 from faker import Faker
-
+import random
 # constants for testing
 n_people = 10
 n_fleets = 10
@@ -27,9 +27,11 @@ cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database
 # cities : province_id, name
 # provinces : country_id, name
 # countries : name
+# collection_points : location_id, name, producer_id, is_dropoff
 
 def cleanUp():
     cursor = cnxn.cursor()
+    cursor.execute("DELETE FROM collection_points")
     cursor.execute("DELETE FROM people")
     cursor.execute("DELETE FROM fleets")
     cursor.execute("DELETE FROM producers")
@@ -90,6 +92,33 @@ def fill():
             locations.append((city_id[0], fake.street_address(), fakeCoord, fake.zipcode()))
 
     cursor.executemany("INSERT INTO locations(city_id, name, coordinates, zipcode) VALUES (?, ?, ?, ?)", locations)
+
+    # get the ids of the locations
+    cursor.execute("SELECT location_id FROM locations")
+    locations_ids = cursor.fetchall()
+
+    for producer_name in producers:
+        # get a random location
+        random_location = random.choice(locations)[1]
+        # get that location id
+        cursor.execute("SELECT location_id FROM locations WHERE name = ?", random_location)
+        location_id = cursor.fetchone()[0]
+
+        # get producer id from name
+        cursor.execute("SELECT producer_id FROM producers WHERE name = ?", producer_name[0])
+        producer_id = cursor.fetchone()[0]
+
+        # collection_points : location_id, name, producer_id, is_dropoff
+
+        collection_point = (location_id, random_location + " " + producer_name[0], producer_id, 1)
+        cursor.execute("INSERT INTO collection_points(location_id, name, producer_id, is_dropoff) VALUES (?, ?, ?, ?)", collection_point)
+
+
+
+
+
+
+
 
     cursor.commit()
 
