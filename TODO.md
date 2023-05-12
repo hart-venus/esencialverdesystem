@@ -4,7 +4,7 @@
 - [X] Empezar app flask
 - [X] Hacer diseño figma o css para hacer evaluacion con rodri
 - [ ] Terminar la conexion ODBC via TVP (table value parameters)
-    - [ ] Crear tvp
+    - [ ] Crear tvps
     - [ ] Crear SP w/ error handling
     - [ ] Crear conexion
 

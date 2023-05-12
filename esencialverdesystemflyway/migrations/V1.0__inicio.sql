@@ -514,6 +514,7 @@ CREATE TABLE recipient_status (
 DROP TABLE IF EXISTS recipients;
 CREATE TABLE recipients (
     recipient_id INT NOT NULL IDENTITY(1,1),
+    trash_type_id INT NOT NULL,
     recipient_type_id INT NOT NULL,
     producer_id INT NOT NULL,
     PRIMARY KEY (recipient_id),
@@ -521,6 +522,7 @@ CREATE TABLE recipients (
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (recipient_type_id) REFERENCES recipient_types(recipient_type_id),
     FOREIGN KEY (recipient_status_id) REFERENCES recipient_status(recipient_status_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
