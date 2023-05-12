@@ -24,7 +24,8 @@ def index():
     # Ejecutar las consultas
     cursor.execute('SELECT full_name FROM people')
     names = cursor.fetchall()
-
+    cursor.execute('SELECT plate FROM fleets')
+    plates = cursor.fetchall()
 
 
     # Cerrar la conexión
@@ -32,7 +33,7 @@ def index():
     conn.close()
 
     # Renderizar la plantilla y pasar los datos
-    return render_template('index.html', names=names)
+    return render_template('index.html', names=names, fleets=plates)
 
 if __name__ == '__main__':
     app.run(debug=True)

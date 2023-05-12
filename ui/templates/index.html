@@ -22,9 +22,10 @@
 
     <label for="camion">Camión:</label>
     <select id="camion" name="camion">
-      <option value="camion1">Camión 1</option>
-      <option value="camion2">Camión 2</option>
-      <option value="camion3">Camión 3</option>
+      {% for fleet in fleets %}
+        <option value="{{ fleet[0] }}">{{ fleet[0] }}</option>
+      {% endfor %}
+
     </select>
     <br><br>
 
