@@ -331,14 +331,13 @@ CREATE TABLE collection_log (
     service_contract_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     responsible_person_id INT NOT NULL,
-    schedule_log_id BIGINT NOT NULL,
 
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     checksum varbinary (64) NOT NULL,
     PRIMARY KEY (collection_log_id),
     FOREIGN KEY (collection_point_id) REFERENCES collection_points(collection_point_id),
-    FOREIGN KEY (schedule_log_id) REFERENCES schedule_log(schedule_log_id),
+
     FOREIGN KEY (movement_type_id) REFERENCES movement_types(movement_type_id),
     FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
     FOREIGN KEY (responsible_person_id) REFERENCES people(person_id),
@@ -358,11 +357,6 @@ CREATE TABLE certificates (
     PRIMARY KEY (certificate_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id)
 );
-
-
-
-
-
 
 -- recipient_brands table
 DROP TABLE IF EXISTS recipient_brands;
