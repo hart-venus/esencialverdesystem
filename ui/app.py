@@ -9,7 +9,35 @@ def index():
     # Si se envía el formulario
     if request.method == 'POST':
         form_data = request.form
-        print(form_data)
+        # save it to a file
+        with open('form_data.txt', 'w') as f:
+            f.write(str(form_data))
+
+        info_transportista = (form_data['transportista'], form_data['camion'], form_data['lugar'])
+
+        # vincular [0] con [0], [1] con [1], etc.
+        recolectas = zip(
+            form_data.getlist('tipo_residuo[]'),
+            form_data.getlist('tipo_recipiente_recolectar[]'),
+            form_data.getlist('cantidad_residuos[]')
+        )
+        # filter when cantidad_residuos == "" remove it from the list
+        recolectas = filter(lambda x: x[2] != "", recolectas)
+
+        entregas = zip(
+            form_data.getlist('tipo_recipiente_entregar[]'),
+            form_data.getlist('cantidad_recipientes[]')
+        )
+        # filter when cantidad_recipientes == "" remove it from the list
+        entregas = filter(lambda x: x[1] != "", entregas)
+
+        # save it to a file
+        with open('recolectas.txt', 'w') as f:
+            f.write(str(list(recolectas)))
+            f.write(str(list(entregas)))
+            f.write(str(info_transportista))
+
+
     # Establecer la cadena de conexión
     server = 'localhost'
     database = 'esencialverdesystem'
