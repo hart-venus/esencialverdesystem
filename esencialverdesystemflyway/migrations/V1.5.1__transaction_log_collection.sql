@@ -134,6 +134,15 @@ BEGIN
             RAISERROR('El tipo de recipiente no existe', 16, 1)
         END
 
+        -- check weight is positive for each row
+        IF EXISTS (
+            SELECT *
+            FROM @RecipientLogTVP
+            WHERE Peso <= 0
+        ) BEGIN
+            RAISERROR('El peso debe ser positivo', 16, 1)
+        END
+
         -- check RecipienteID exists for each row
         IF EXISTS (
             SELECT *

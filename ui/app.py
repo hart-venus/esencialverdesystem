@@ -37,12 +37,17 @@ def index():
             TipoRecipienteID INT NULL,
             TipoResiduoID INT NULL
         );
+    STORED PROCEDURE REFERENCE
+
+    CREATE PROCEDURE [dbo].[SP_RegistrarColeccion]
+	    @CollectorTVP CollectorInfo,
+	    @RecipientLogTVP RecipientLogInfo
+    AS
+    ...
     """
     # Si se envía el formulario
     if request.method == 'POST':
         form_data = request.form
-
-        TransportistaTVP = [(form_data['transportista'], form_data['camion'], form_data['lugar'])]
 
         # vincular [0] con [0], [1] con [1], etc.
         recolectas = zip(
@@ -84,10 +89,17 @@ def index():
             ) for r in entregas
         ]
 
-        # create the TVP
+        # create the TVPs
+        TransportistaTVP = [(form_data['transportista'], form_data['camion'], form_data['lugar'])]
         RecipientTVP = RecolectasData + EntregasData
-
-
+        # see if we can call the procedure
+        try:
+            cursor.execute("{CALL SP_RegistrarColeccion(?, ?)}", TransportistaTVP, RecipientTVP)
+            conn.commit()
+        except pyodbc.Error as e:
+            sqlstate = e.args[0]
+            message = e.args[1]
+            print(f"An error occurred: {sqlstate} {message}")
 
 
 
