@@ -5,8 +5,8 @@
 -- de recoleccion de basura
 -----------------------------------------------------------
 CREATE PROCEDURE [dbo].[SP_RegistrarColeccion]
-	@CollectorTVP CollectorInfo READONLY,
-	@RecipientLogTVP RecipientLogInfo READONLY
+	@CollectorTVP CollectorInfo,
+	@RecipientLogTVP RecipientLogInfo
 AS
 BEGIN
 
