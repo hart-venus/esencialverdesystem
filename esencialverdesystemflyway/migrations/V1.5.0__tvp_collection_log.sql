@@ -16,5 +16,8 @@ CREATE TYPE RecipientLogInfo AS TABLE
     TipoRecipiente VARCHAR(255),
     Peso DECIMAL(12, 4),
     TipoResiduo VARCHAR(255),
-    Accion INT
+    Accion INT,
+    RecipienteID INT NULL,
+    TipoRecipienteID INT NULL,
+    TipoResiduoID INT NULL
 );
