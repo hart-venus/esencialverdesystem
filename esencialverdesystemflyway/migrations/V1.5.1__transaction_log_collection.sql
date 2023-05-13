@@ -5,8 +5,8 @@
 -- de recoleccion de basura
 -----------------------------------------------------------
 CREATE PROCEDURE [dbo].[SP_RegistrarColeccion]
-	@CollectorTVP CollectorInfo,
-	@RecipientLogTVP RecipientLogInfo
+	@CollectorTVP CollectorInfo READONLY,
+	@RecipientLogTVP RecipientLogInfo READONLY
 AS
 BEGIN
 
@@ -36,46 +36,53 @@ BEGIN
     -- 0. conseguir datetime actual
     SET @Now = GETDATE()
     -- 1. conseguir el id del punto de recoleccion
-    SELECT collection_point_id INTO @CollectionPointID
+    SELECT collection_point_id INTO CollectionPointID
     FROM collection_points
-    WHERE name = @CollectorTVP.Lugar
+    WHERE name = ( SELECT Lugar FROM @CollectorTVP)
     -- 2. conseguir el id del productor basado en el punto de recoleccion
-    SELECT producer_id INTO @ProducerID
+    SELECT producer_id INTO ProducerID
     FROM collection_points
     WHERE collection_point_id = @CollectionPointID
     -- 3. conseguir el id del contrato de servicio basado en el productor
-    SELECT service_contract_id INTO @ServiceContractID
+    SELECT service_contract_id INTO ServiceContractID
     FROM service_contracts
     WHERE producer_id = @ProducerID
     AND active = 1
     AND start_date <= @Now
     AND end_date >= @Now
     -- 4. conseguir persona responsable de la recoleccion
-    SELECT person_id INTO @CollectorID
+    SELECT person_id INTO CollectorID
     FROM people
-    WHERE name = @CollectorTVP.Nombre
+    WHERE full_name = ( SELECT Nombre FROM @CollectorTVP)
     -- 5. conseguir fleta responsable de la recoleccion
-    SELECT fleet_id INTO @FleetID
+    SELECT fleet_id INTO FleetID
     FROM fleets
-    WHERE plate = @CollectorTVP.Placa
+    WHERE plate = ( SELECT Placa FROM @CollectorTVP)
+
 
     -- 6. rellenar la TVP con IDS de la entrada
 
+    -- 6.0. no se pueden modificar los datos de la TVP, asi que se crea una nueva
+    -- tabla temporal
+
+    -- 6.0.1. crear la tabla temporal
+    select * into #RecipientLogTVP from @RecipientLogTVP
+
     -- 6.1. conseguir el id del tipo del recipiente
-    UPDATE @RecipientLogTVP
+    UPDATE #RecipientLogTVP
     SET TipoRecipienteID = recipient_types.recipient_type_id
     FROM recipient_types
-    WHERE recipient_types.name = @RecipientLogTVP.TipoRecipiente
+    WHERE recipient_types.name = #RecipientLogTVP.TipoRecipiente
     -- 6.2. conseguir el id del tipo de residuo
-    UPDATE @RecipientLogTVP
+    UPDATE #RecipientLogTVP
     SET TipoResiduoID = waste_types.waste_type_id
     FROM waste_types
-    WHERE waste_types.name = @RecipientLogTVP.TipoResiduo
+    WHERE waste_types.name = #RecipientLogTVP.TipoResiduo
     -- 6.3 conseguir un recipiente random del tipo de recipiente
-    UPDATE @RecipientLogTVP
+    UPDATE #RecipientLogTVP
     SET RecipienteID = recipients.recipient_id
     FROM recipients
-    WHERE recipients.recipient_type_id = @RecipientLogTVP.TipoRecipienteID
+    WHERE recipients.recipient_type_id = #RecipientLogTVP.TipoRecipienteID
 
 	SET @InicieTransaccion = 0
 	IF @@TRANCOUNT=0 BEGIN
@@ -108,12 +115,12 @@ BEGIN
         INSERT INTO collection_log (
             collection_point_id,
             service_contract_id,
-            `datetime`,
+            datetime,
             responsible_person_id,
             fleet_id,
-            `checksum`
+			checksum
         )
-        OUTPUT INSERTED.collection_log_id INTO @CollectionID
+        OUTPUT INSERTED.collection_log_id INTO CollectionID
 
         VALUES
         (
@@ -128,7 +135,7 @@ BEGIN
         -- check TipoRecipienteID exists for each row
         IF EXISTS (
             SELECT *
-            FROM @RecipientLogTVP
+            FROM #RecipientLogTVP
             WHERE TipoRecipienteID IS NULL
         ) BEGIN
             RAISERROR('El tipo de recipiente no existe', 16, 1)
@@ -137,7 +144,7 @@ BEGIN
         -- check weight is positive for each row
         IF EXISTS (
             SELECT *
-            FROM @RecipientLogTVP
+            FROM #RecipientLogTVP
             WHERE Peso <= 0
         ) BEGIN
             RAISERROR('El peso debe ser positivo', 16, 1)
@@ -146,7 +153,7 @@ BEGIN
         -- check RecipienteID exists for each row
         IF EXISTS (
             SELECT *
-            FROM @RecipientLogTVP
+            FROM #RecipientLogTVP
             WHERE RecipienteID IS NULL
         ) BEGIN
             RAISERROR('El recipiente no existe', 16, 1)
@@ -155,7 +162,7 @@ BEGIN
         -- check TipoResiduoID exists for each row
         IF EXISTS (
             SELECT *
-            FROM @RecipientLogTVP
+            FROM #RecipientLogTVP
             WHERE TipoResiduoID IS NULL
         ) BEGIN
             RAISERROR('El tipo de residuo no existe', 16, 1)
@@ -167,8 +174,8 @@ BEGIN
             recipient_id,
             waste_type_id,
             movement_type_id,
-            `weight`,
-            `datetime`
+            weight,
+            datetime
         )
         SELECT
             @CollectionID,
@@ -177,7 +184,7 @@ BEGIN
             Accion,
             Peso,
             @Now
-        FROM @RecipientLogTVP
+        FROM #RecipientLogTVP
 
 		IF @InicieTransaccion=1 BEGIN
 			COMMIT
