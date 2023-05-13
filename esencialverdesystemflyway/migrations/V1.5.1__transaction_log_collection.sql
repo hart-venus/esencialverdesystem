@@ -4,6 +4,7 @@
 -- Desc: crea el procedimiento que registra un collection log, es decir un movimiento
 -- de recoleccion de basura
 -----------------------------------------------------------
+--DROP PROCEDURE [dbo].[SP_RegistrarColeccion]
 CREATE PROCEDURE [dbo].[SP_RegistrarColeccion]
 	@CollectorTVP CollectorInfo READONLY,
 	@RecipientLogTVP RecipientLogInfo READONLY
@@ -18,6 +19,8 @@ BEGIN
 
 	-- declaracion de otras variables
     -- variables para la recoleccion
+	CREATE TABLE #TempCollectionID (collection_log_id BIGINT);
+
     DECLARE @CollectionPointID INT
     DECLARE @MovementTypeID INT
     DECLARE @ServiceContractID INT
@@ -36,26 +39,27 @@ BEGIN
     -- 0. conseguir datetime actual
     SET @Now = GETDATE()
     -- 1. conseguir el id del punto de recoleccion
-    SELECT collection_point_id INTO CollectionPointID
-    FROM collection_points
+
+	SELECT @CollectionPointID = collection_point_id
+	FROM collection_points
     WHERE name = ( SELECT Lugar FROM @CollectorTVP)
     -- 2. conseguir el id del productor basado en el punto de recoleccion
-    SELECT producer_id INTO ProducerID
-    FROM collection_points
-    WHERE collection_point_id = @CollectionPointID
+    SELECT @ProducerID = producer_id 
+	FROM collection_points
+	WHERE collection_point_id = @CollectionPointID
     -- 3. conseguir el id del contrato de servicio basado en el productor
-    SELECT service_contract_id INTO ServiceContractID
+    SELECT @ServiceContractID = service_contract_id
     FROM service_contracts
     WHERE producer_id = @ProducerID
     AND active = 1
     AND start_date <= @Now
     AND end_date >= @Now
     -- 4. conseguir persona responsable de la recoleccion
-    SELECT person_id INTO CollectorID
+    SELECT @CollectorID = person_id
     FROM people
     WHERE full_name = ( SELECT Nombre FROM @CollectorTVP)
     -- 5. conseguir fleta responsable de la recoleccion
-    SELECT fleet_id INTO FleetID
+    SELECT @FleetID = fleet_id
     FROM fleets
     WHERE plate = ( SELECT Placa FROM @CollectorTVP)
 
@@ -75,9 +79,9 @@ BEGIN
     WHERE recipient_types.name = #RecipientLogTVP.TipoRecipiente
     -- 6.2. conseguir el id del tipo de residuo
     UPDATE #RecipientLogTVP
-    SET TipoResiduoID = waste_types.waste_type_id
-    FROM waste_types
-    WHERE waste_types.name = #RecipientLogTVP.TipoResiduo
+    SET TipoResiduoID = trash_types.trash_type_id
+    FROM trash_types
+    WHERE trash_types.name = #RecipientLogTVP.TipoResiduo
     -- 6.3 conseguir un recipiente random del tipo de recipiente
     UPDATE #RecipientLogTVP
     SET RecipienteID = recipients.recipient_id
@@ -120,7 +124,7 @@ BEGIN
             fleet_id,
 			checksum
         )
-        OUTPUT INSERTED.collection_log_id INTO CollectionID
+        OUTPUT (INSERTED.collection_log_id) INTO #TempCollectionID
 
         VALUES
         (
@@ -131,6 +135,10 @@ BEGIN
             @FleetID,
             CHECKSUM(@CollectionPointID, @ServiceContractID, @Now, @CollectorID, @FleetID)
         )
+
+		-- get tempCollectionID value back
+		SELECT @CollectionID = collection_log_id FROM #TempCollectionID;
+		DROP TABLE #TempCollectionID;
 
         -- check TipoRecipienteID exists for each row
         IF EXISTS (

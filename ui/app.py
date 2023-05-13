@@ -99,7 +99,10 @@ def index():
         except pyodbc.Error as e:
             sqlstate = e.args[0]
             message = e.args[1]
-            print(f"An error occurred: {sqlstate} {message}")
+            err_str = f"An error occurred: {sqlstate} {message}"
+            # save to file
+            with open("error.log", "a") as f:
+                f.write(err_str + "\n")
 
 
 
