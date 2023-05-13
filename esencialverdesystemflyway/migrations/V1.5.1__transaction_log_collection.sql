@@ -180,7 +180,7 @@ BEGIN
         INSERT INTO recipient_log (
             collection_log_id,
             recipient_id,
-            waste_type_id,
+            trash_type_id,
             movement_type_id,
             weight,
             datetime

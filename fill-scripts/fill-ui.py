@@ -31,6 +31,7 @@ cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database
 
 def cleanUp():
     cursor = cnxn.cursor()
+    cursor.execute("DELETE FROM service_contracts")
     cursor.execute("DELETE FROM recipient_types")
     cursor.execute("DELETE FROM recipient_models")
     cursor.execute("DELETE FROM recipient_brands")
@@ -116,6 +117,19 @@ def fill():
     cursor.executemany("INSERT INTO producers(name) VALUES (?)", producers)
     cursor.executemany("INSERT INTO trash_types(name, is_recyclable) VALUES (?, ?)", tipos_de_basura)
 
+    # get the ids of the producers
+    cursor.execute("SELECT producer_id FROM producers")
+    producers_ids = cursor.fetchall()
+
+    service_contracts = [
+        (
+            producer_id[0],
+            fake.date_between(start_date='-1y', end_date='today').strftime('%Y-%m-%d'), # current date
+            fake.date_between(start_date='today', end_date='+1y').strftime('%Y-%m-%d'), # current date + 1 year
+        ) for producer_id in producers_ids
+    ]
+    print(service_contracts)
+    cursor.executemany("INSERT INTO service_contracts(producer_id, start_date, end_date) VALUES (?, ?, ?)", service_contracts)
 
     # get the ids of the countries
     cursor.execute("SELECT country_id FROM countries")
