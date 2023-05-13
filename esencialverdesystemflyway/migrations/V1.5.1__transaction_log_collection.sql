@@ -72,6 +72,15 @@ BEGIN
     -- 6.0.1. crear la tabla temporal
     select * into #RecipientLogTVP from @RecipientLogTVP
 
+    -- RecipienteID INT NULL,
+    -- TipoRecipienteID INT NULL,
+    -- TipoResiduoID INT NULL
+
+    -- añadir las columnas
+    ALTER TABLE #RecipientLogTVP ADD RecipienteID INT NULL;
+    ALTER TABLE #RecipientLogTVP ADD TipoRecipienteID INT NULL;
+    ALTER TABLE #RecipientLogTVP ADD TipoResiduoID INT NULL;
+
     -- 6.1. conseguir el id del tipo del recipiente
     UPDATE #RecipientLogTVP
     SET TipoRecipienteID = recipient_types.recipient_type_id

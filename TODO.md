@@ -7,6 +7,7 @@
     - [X] Crear tvps
     - [X] Crear SP w/ error handling
     - [ ] FIXME: hacer que la quantity de los recipientes a retornar si me de mas registros
+    - [ ] FIXME: añadir habilidad de borrar una parte del form
     - [ ] Crear conexion
 
 - [ ] Evaluar con rodri

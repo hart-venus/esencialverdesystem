@@ -4,6 +4,12 @@ import pandas as pd
 
 app = Flask(__name__)
 
+def floatOrZero(x):
+    try:
+        return float(x)
+    except ValueError:
+        return 0.0
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
@@ -61,12 +67,9 @@ def index():
         RecolectasData = [
             (
                 r[1],
-                r[2],
+                floatOrZero(r[2]), # Peso
                 r[0],
                 1, # Accion de recolectar
-                None,
-                None,
-                None
             ) for r in recolectas
         ]
 
@@ -77,21 +80,22 @@ def index():
         # filter when cantidad_recipientes == "" remove it from the list
         entregas = filter(lambda x: x[1] != "", entregas)
 
+        """
         EntregasData = [
             (
                 r[0],
-                r[1],
-                None,
-                2, # Accion de entregar
-                None,
-                None,
-                None
+                int(r[1]),
+                0,
+                2,
             ) for r in entregas
         ]
-
+        """
         # create the TVPs
         TransportistaTVP = [(form_data['transportista'], form_data['camion'], form_data['lugar'])]
-        RecipientTVP = RecolectasData + EntregasData
+        RecipientTVP = RecolectasData # + EntregasData
+
+        with open("error.log", "w") as f:
+            f.write(RecipientTVP.__str__() + "\n")
         # see if we can call the procedure
         try:
             cursor.execute("{CALL SP_RegistrarColeccion(?, ?)}", TransportistaTVP, RecipientTVP)
