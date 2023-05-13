@@ -56,7 +56,7 @@
       </select>
       <br><br>
 
-      <label for="cantidad_residuos">Cantidad de Residuos (kg):</label>
+      <label for="cantidad_residuos">Peso de residuos (kg):</label>
       <input type="text" id="cantidad_residuos" name="cantidad_residuos[]">
       <br><br>
     </div>
@@ -65,6 +65,15 @@
     <h2>3. Selección de Recipientes a Entregar</h2>
 
     <div class="entrega-container">
+
+      <label for="tipo_residuo_recolectar">Tipo de Residuo:</label>
+      <select id="tipo_residuo_recolectar" name="tipo_residuo_recolectar[]">
+        {% for trash_type in trash_types %}
+        <option value="{{ trash_type[0] }}">{{ trash_type[0] }}</option>
+        {% endfor %}
+      </select>
+      <br><br>
+
       <label for="tipo_recipiente_entregar">Tipo de Recipiente:</label>
       <select id="tipo_recipiente_entregar" name="tipo_recipiente_entregar[]">
         {% for recipient_type in recipient_types %}

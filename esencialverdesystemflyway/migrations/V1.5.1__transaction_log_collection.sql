@@ -171,7 +171,7 @@ BEGIN
         IF EXISTS (
             SELECT *
             FROM #RecipientLogTVP
-            WHERE Peso <= 0
+            WHERE Peso < 0
         ) BEGIN
             RAISERROR('El peso debe ser positivo', 16, 1)
         END

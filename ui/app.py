@@ -10,6 +10,12 @@ def floatOrZero(x):
     except ValueError:
         return 0.0
 
+def IntOrZero(x):
+    try:
+        return int(x)
+    except ValueError:
+        return 0
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
@@ -74,28 +80,31 @@ def index():
         ]
 
         entregas = zip(
+            form_data.getlist('tipo_residuo_recolectar[]'),
             form_data.getlist('tipo_recipiente_entregar[]'),
             form_data.getlist('cantidad_recipientes[]')
         )
         # filter when cantidad_recipientes == "" remove it from the list
-        entregas = filter(lambda x: x[1] != "", entregas)
+        entregas = filter(lambda x: x[2] != "", entregas)
 
-        """
+
         EntregasData = [
             (
+                r[1],
+                0.0, # Peso es nulo, lo mide el cliente
                 r[0],
-                int(r[1]),
-                0,
-                2,
-            ) for r in entregas
+                2, # Accion de entregar
+            ) for r in entregas for i in range(IntOrZero(r[2])) # for each recipient
         ]
-        """
+        with open("error.log", "w") as f:
+            # entregas
+            f.write(str(list(entregas)) + "\n")
+            f.write(RecolectasData.__str__() + "\n")
+            f.write(EntregasData.__str__() + "\n")
         # create the TVPs
         TransportistaTVP = [(form_data['transportista'], form_data['camion'], form_data['lugar'])]
-        RecipientTVP = RecolectasData # + EntregasData
+        RecipientTVP = RecolectasData + EntregasData
 
-        with open("error.log", "w") as f:
-            f.write(RecipientTVP.__str__() + "\n")
         # see if we can call the procedure
         try:
             cursor.execute("{CALL SP_RegistrarColeccion(?, ?)}", TransportistaTVP, RecipientTVP)
