@@ -10,8 +10,7 @@
     - [X] FIXME: hacer que la quantity de los recipientes a retornar si me de mas registros
     - [ ] FIXME: añadir habilidad de borrar una parte del form
     - [ ] Error handling: dar el msj de error al usuario en alerta de js
-
-
+- [ ] Hacer que se vea bonita la pagina
 - [ ] Evaluar con rodri
 - [ ] Empezar el REST API con NODE
 - [ ] Evaluar con rodri
