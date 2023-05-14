@@ -109,7 +109,7 @@ def index():
             errorStr = "-1"
         except pyodbc.Error as e:
             message = e.args[1]
-
+            # [Microsoft sql ] [ error code ... ] - message
             # Extract the error message
             start_index = message.rfind(']') + 1
             end_index = message.find('-', start_index)

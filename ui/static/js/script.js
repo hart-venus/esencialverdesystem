@@ -13,6 +13,9 @@ function addRecoleccion() {
     let newRecoleccion = recoleccioncontainer.cloneNode(true);
     // make the new recoleccion container visible
     newRecoleccion.style.display = 'block';
+    setTimeout(function() {
+        newRecoleccion.classList.add("visible");
+      }, 10);
     // add as a sibling, just before the addRecoleccionButton
     recoleccioncontainer.parentNode.insertBefore(newRecoleccion, addRecoleccionButton);
 }
@@ -27,6 +30,11 @@ function addEntrega() {
 }
 
 function deleteParent(element) {
-    element.parentNode.remove();
-}
+    // remove visible class
+    element.parentNode.classList.remove("visible");
+    // remove the element after 0.5s
+    setTimeout(function() {
+        element.parentNode.remove();
+        }, 100);
 
+}

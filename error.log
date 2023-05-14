@@ -12,3 +12,5 @@ Ha ocurrido un error: [ODBC Driver 17 for SQL Server
 Ha ocurrido un error: [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]No hay recipientes para registrar - Error Number: 2001 (50000) (SQLParamData)
 Ha ocurrido un error: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]No hay recipientes para registrar
 Ha ocurrido un error: No hay recipientes para registrar
+Ha ocurrido un error: El peso debe ser positivo
+Ha ocurrido un error: No hay recipientes para registrar
