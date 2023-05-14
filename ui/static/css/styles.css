@@ -1,3 +1,77 @@
-* {
-    font-family: 'Courier New', Courier, monospace;
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200&display=swap');
+
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+    background: rgb(255,238,246);
+    background: radial-gradient(circle, rgba(255,238,246,1) 0%, rgba(233,255,231,1) 100%);
+}
+h1, h2{
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 200;
+    color: #fff;
+    font-size: 2em;
+
+
+}
+
+h2 {
+    color: black;
+}
+
+.logo img {
+    width: 100px;
+    /* white glow */
+    filter: drop-shadow(0 0 10px #c6ffb8);
+    margin-right: 40px;
+}
+
+.header-placeholder {
+    height: 150px;
+    width: 100%;
+}
+.header-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+header {
+    background-color: rgba(5, 39, 36, 0.722);
+    filter: drop-shadow(0 0 10px rgb(5, 39, 36));
+    /* blur */
+    backdrop-filter: blur(5px);
+    border-radius: 200px;
+    padding-right: 50px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+
+    margin: 20px 0  ;
+}
+
+/* For Webkit browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 10px; /* Adjust the width as desired */
+    background: rgb(255,238,246);
+    width: 5px;
+    background: radial-gradient(circle, rgba(255,238,246,1) 0%, rgba(233,255,231,1) 100%);
+
+}
+
+::-webkit-scrollbar-thumb {
+background-color: rgba(5, 39, 36, 0.722); /* Replace with your desired color */
+border-radius: 100px; /* Adjust the border radius to make it rounded */
 }

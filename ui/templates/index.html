@@ -4,10 +4,18 @@
     <script src="{{ url_for('static', filename='js/script.js')}}" defer> </script>
   </head>
 <body>
-  <header>
-    <div class="logo"> logo aqui </div>
-    <h1> Recoleccion y canje de recipientes </h1>
-  </header>
+  <div class="header-placeholder"></div>
+
+  <div class="header-container">
+    <header>
+      <div class="logo">
+
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+      </div>
+      <h1> Menú de Canje</h1>
+    </header>
+  </div>
+
 
   {% if error != "" and error != "-1" %}
     <div class="error">
