@@ -9,6 +9,16 @@
     <h1> Recoleccion y canje de recipientes </h1>
   </header>
 
+  {% if error != "" and error != "-1" %}
+    <div class="error">
+      {{ error }}
+    </div>
+  {% elif error == "-1" %}
+    <div class="success">
+      Se ha registrado la transacción exitosamente
+    </div>
+  {% endif %}
+
   <form action="/" method="post">
     <h2>1. Selección de Transportista</h2>
 
@@ -59,6 +69,7 @@
       <label for="cantidad_residuos">Peso de residuos (kg):</label>
       <input type="text" id="cantidad_residuos" name="cantidad_residuos[]">
       <br><br>
+      <button type="button" onclick="deleteParent(this)">Eliminar</button>
     </div>
     <button type="button" id="addRecoleccionButton" onclick="addRecoleccion()">Agregar Recolección</button>
 
@@ -85,6 +96,8 @@
       <label for="cantidad_recipientes">Cantidad de Recipientes:</label>
       <input type="text" id="cantidad_recipientes" name="cantidad_recipientes[]">
       <br><br>
+      <button type="button" onclick="deleteParent(this)">Eliminar</button>
+
     </div>
     <button type="button" id="addEntregaButton" onclick="addEntrega()">Agregar Entrega</button>
 

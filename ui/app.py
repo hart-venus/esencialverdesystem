@@ -19,6 +19,7 @@ def IntOrZero(x):
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
+    errorStr = ""
     # Establecer la cadena de conexión
     server = 'localhost'
     database = 'esencialverdesystem'
@@ -96,11 +97,7 @@ def index():
                 2, # Accion de entregar
             ) for r in entregas for i in range(IntOrZero(r[2])) # for each recipient
         ]
-        with open("error.log", "w") as f:
-            # entregas
-            f.write(str(list(entregas)) + "\n")
-            f.write(RecolectasData.__str__() + "\n")
-            f.write(EntregasData.__str__() + "\n")
+
         # create the TVPs
         TransportistaTVP = [(form_data['transportista'], form_data['camion'], form_data['lugar'])]
         RecipientTVP = RecolectasData + EntregasData
@@ -109,15 +106,18 @@ def index():
         try:
             cursor.execute("{CALL SP_RegistrarColeccion(?, ?)}", TransportistaTVP, RecipientTVP)
             conn.commit()
+            errorStr = "-1"
         except pyodbc.Error as e:
-            sqlstate = e.args[0]
             message = e.args[1]
-            err_str = f"An error occurred: {sqlstate} {message}"
-            # save to file
+
+            # Extract the error message
+            start_index = message.rfind(']') + 1
+            end_index = message.find('-', start_index)
+            message = message[start_index:end_index].strip()
+
+            errorStr = f"Ha ocurrido un error: {message}"
             with open("error.log", "a") as f:
-                f.write(err_str + "\n")
-
-
+                f.write(f"{errorStr}\n")
 
     # Ejecutar las consultas
     cursor.execute('SELECT full_name FROM people')
@@ -138,7 +138,7 @@ def index():
     conn.close()
 
     # Renderizar la plantilla y pasar los datos
-    return render_template('index.html', names=names, recipient_types = recipient_types, trash_types=trash_types, fleets=plates, collection_points_names=collection_points_names)
+    return render_template('index.html', error=errorStr, names=names, recipient_types = recipient_types, trash_types=trash_types, fleets=plates, collection_points_names=collection_points_names)
 
 if __name__ == '__main__':
     app.run(debug=True)

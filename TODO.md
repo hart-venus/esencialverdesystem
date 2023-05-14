@@ -8,8 +8,8 @@
     - [X] Crear SP w/ error handling
     - [X] Crear conexion
     - [X] FIXME: hacer que la quantity de los recipientes a retornar si me de mas registros
-    - [ ] FIXME: añadir habilidad de borrar una parte del form
-    - [ ] Error handling: dar el msj de error al usuario en alerta de js
+    - [X] FIXME: añadir habilidad de borrar una parte del form
+    - [X] Error handling: dar el msj de error al usuario en div
 - [ ] Hacer que se vea bonita la pagina
 - [ ] Evaluar con rodri
 - [ ] Empezar el REST API con NODE
