@@ -31,6 +31,11 @@ cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database
 
 def cleanUp():
     cursor = cnxn.cursor()
+    cursor.execute("DELETE FROM movement_types")
+    cursor.execute("DELETE FROM recipients")
+
+    cursor.execute("DELETE FROM recipient_status")
+    cursor.execute("DELETE FROM service_contracts")
     cursor.execute("DELETE FROM recipient_types")
     cursor.execute("DELETE FROM recipient_models")
     cursor.execute("DELETE FROM recipient_brands")
@@ -45,9 +50,28 @@ def cleanUp():
     cursor.execute("DELETE FROM region_areas")
     cursor.execute("DELETE FROM countries")
 
+    # important indexes reset
+    cursor.execute("DBCC CHECKIDENT ('recipient_status', RESEED, 0)")
+    cursor.execute("DBCC CHECKIDENT ('movement_types', RESEED, 0)")
     cursor.commit()
 
 def fill():
+
+    recipient_status = [
+        ("OK",),
+        ("Dañado",),
+        ("En reparación",),
+        ("En mantenimiento",),
+        ("Pendiente reemplazar",),
+    ]
+
+    movement_types = [
+        ("Recolección",),
+        ("Entrega",),
+        ("Reparación",),
+        ("Mantenimiento",),
+        ("Reemplazo",),
+    ]
 
     tipos_de_basura = [
     "Latas de refrescos",
@@ -109,6 +133,10 @@ def fill():
     recipient_brands = [(fake.company(),) for i in range(n_producers)]
     recipient_models = [(fake.company(),) for i in range(n_producers)]
 
+    # insertar recipient_status
+    cursor.executemany("INSERT INTO recipient_status(name) VALUES (?)", recipient_status)
+    cursor.executemany("INSERT INTO movement_types(name) VALUES (?)", movement_types)
+
     cursor.executemany("INSERT INTO recipient_brands(name) VALUES (?)", recipient_brands)
     cursor.executemany("INSERT INTO people(full_name) VALUES (?)", people)
     cursor.executemany("INSERT INTO fleets(plate, capacity) VALUES (?, ?)", fleets)
@@ -116,6 +144,21 @@ def fill():
     cursor.executemany("INSERT INTO producers(name) VALUES (?)", producers)
     cursor.executemany("INSERT INTO trash_types(name, is_recyclable) VALUES (?, ?)", tipos_de_basura)
 
+    # get the ids of the producers
+    cursor.execute("SELECT producer_id FROM producers")
+    producers_ids = cursor.fetchall()
+
+    service_contracts = [
+        (
+            producer_id[0],
+            fake.date_between(start_date='-1y', end_date='today').strftime('%Y-%m-%d'), # current date
+            fake.date_between(start_date='today', end_date='+1y').strftime('%Y-%m-%d'), # current date + 1 year
+        ) for producer_id in producers_ids
+    ]
+
+
+    print(service_contracts)
+    cursor.executemany("INSERT INTO service_contracts(producer_id, start_date, end_date) VALUES (?, ?, ?)", service_contracts)
 
     # get the ids of the countries
     cursor.execute("SELECT country_id FROM countries")
@@ -193,6 +236,19 @@ def fill():
     contenedores_de_basura = [(contenedor_de_basura[0], random.choice(recipient_models_ids)[0]) for contenedor_de_basura in contenedores_de_basura]
 
     cursor.executemany("INSERT INTO recipient_types(name, recipient_model_id) VALUES (?, ?)", contenedores_de_basura)
+
+
+    import itertools
+
+    recipient_types = cursor.execute("SELECT recipient_type_id FROM recipient_types").fetchall()
+    producers = cursor.execute("SELECT producer_id FROM producers").fetchall()
+
+    recipients = [
+        (recipient_type_id[0], producer_id[0])
+        for recipient_type_id, producer_id in itertools.product(recipient_types, producers)
+        for _ in range(10)
+    ]
+    cursor.executemany("INSERT INTO recipients(recipient_type_id, producer_id) VALUES (?, ?)", recipients)
     cursor.commit()
 
 if __name__ == '__main__':

@@ -6,11 +6,12 @@
 - [X] Terminar la conexion ODBC via TVP (table value parameters)
     - [X] Crear tvps
     - [X] Crear SP w/ error handling
-    - [ ] FIXME: hacer que la quantity de los recipientes a retornar si me de mas registros
-    - [ ] Crear conexion
-
-- [ ] Evaluar con rodri
-- [ ] Empezar el REST API con NODE
+    - [X] Crear conexion
+    - [X] FIXME: hacer que la quantity de los recipientes a retornar si me de mas registros
+    - [X] FIXME: añadir habilidad de borrar una parte del form
+    - [X] Error handling: dar el msj de error al usuario en div
+- [X] Hacer que se vea bonita la pagina
+- [ ] Empezar el REST API con NODE (Tomas)
 - [ ] Evaluar con rodri
 - [ ] Si nos da tiempo, hacer puntos extra con ORM (ruby)
 - [ ] Actualizar README.md

@@ -4,7 +4,7 @@
 -- Desc: crea el procedimiento que registra un collection log, es decir un movimiento
 -- de recoleccion de basura
 -----------------------------------------------------------
---DROP PROCEDURE [dbo].[SP_RegistrarColeccion]
+-- DROP PROCEDURE [dbo].[SP_RegistrarColeccion]
 CREATE PROCEDURE [dbo].[SP_RegistrarColeccion]
 	@CollectorTVP CollectorInfo READONLY,
 	@RecipientLogTVP RecipientLogInfo READONLY
@@ -44,7 +44,7 @@ BEGIN
 	FROM collection_points
     WHERE name = ( SELECT Lugar FROM @CollectorTVP)
     -- 2. conseguir el id del productor basado en el punto de recoleccion
-    SELECT @ProducerID = producer_id 
+    SELECT @ProducerID = producer_id
 	FROM collection_points
 	WHERE collection_point_id = @CollectionPointID
     -- 3. conseguir el id del contrato de servicio basado en el productor
@@ -72,11 +72,21 @@ BEGIN
     -- 6.0.1. crear la tabla temporal
     select * into #RecipientLogTVP from @RecipientLogTVP
 
+    -- RecipienteID INT NULL,
+    -- TipoRecipienteID INT NULL,
+    -- TipoResiduoID INT NULL
+
+    -- añadir las columnas
+    ALTER TABLE #RecipientLogTVP ADD RecipienteID INT NULL;
+    ALTER TABLE #RecipientLogTVP ADD TipoRecipienteID INT NULL;
+    ALTER TABLE #RecipientLogTVP ADD TipoResiduoID INT NULL;
+
     -- 6.1. conseguir el id del tipo del recipiente
     UPDATE #RecipientLogTVP
     SET TipoRecipienteID = recipient_types.recipient_type_id
     FROM recipient_types
     WHERE recipient_types.name = #RecipientLogTVP.TipoRecipiente
+
     -- 6.2. conseguir el id del tipo de residuo
     UPDATE #RecipientLogTVP
     SET TipoResiduoID = trash_types.trash_type_id
@@ -87,6 +97,7 @@ BEGIN
     SET RecipienteID = recipients.recipient_id
     FROM recipients
     WHERE recipients.recipient_type_id = #RecipientLogTVP.TipoRecipienteID
+    AND recipients.producer_id = @ProducerID
 
 	SET @InicieTransaccion = 0
 	IF @@TRANCOUNT=0 BEGIN
@@ -98,6 +109,13 @@ BEGIN
 	BEGIN TRY
 		SET @CustomError = 2001
 
+        -- check temp table exists and has more than 0 rows
+        IF NOT EXISTS (
+            SELECT *
+            FROM #RecipientLogTVP
+        ) BEGIN
+            RAISERROR('No hay recipientes para registrar', 16, 1)
+        END
 		-- check collection point exists
         IF @CollectionPointID IS NULL BEGIN
             RAISERROR('El punto de recoleccion no existe', 16, 1)
@@ -153,7 +171,7 @@ BEGIN
         IF EXISTS (
             SELECT *
             FROM #RecipientLogTVP
-            WHERE Peso <= 0
+            WHERE Peso < 0
         ) BEGIN
             RAISERROR('El peso debe ser positivo', 16, 1)
         END
@@ -180,7 +198,7 @@ BEGIN
         INSERT INTO recipient_log (
             collection_log_id,
             recipient_id,
-            waste_type_id,
+            trash_type_id,
             movement_type_id,
             weight,
             datetime

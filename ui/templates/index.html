@@ -1,88 +1,174 @@
 <html>
   <head>
+    <script src="{{ url_for('static', filename='js/all.min.js') }}"></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/all.min.css') }}"
+    />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="{{ url_for('static', filename='js/script.js')}}" defer> </script>
   </head>
 <body>
-  <header>
-    <div class="logo"> logo aqui </div>
-    <h1> Recoleccion y canje de recipientes </h1>
-  </header>
+  <div class="header-placeholder"></div>
+
+  <div class="header-container">
+    <header>
+      <div class="logo">
+
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+      </div>
+      <h1> Menú de Canje</h1>
+    </header>
+  </div>
+
+
+  {% if error != "" and error != "-1" %}
+    <div class="error">
+      <i class="fas fa-times-circle"></i>
+      {{ error }}
+    </div>
+  {% elif error == "-1" %}
+    <div class="success">
+      <i class="fas fa-check-circle"></i>
+      Se ha registrado la transacción exitosamente
+    </div>
+  {% endif %}
 
   <form action="/" method="post">
-    <h2>1. Selección de Transportista</h2>
+    <div class="transportista-container">
+      <h2><i class="fas fa-user icon"></i> Información Personal</h2>
 
-    <label for="transportista">Transportista:</label>
-    <select id="transportista" name="transportista">
-      {% for name in names %}
-        <option value="{{ name[0] }}">{{ name[0] }}</option>
-      {% endfor %}
-    </select>
-    <br><br>
 
-    <label for="camion">Camión:</label>
-    <select id="camion" name="camion">
-      {% for fleet in fleets %}
-        <option value="{{ fleet[0] }}">{{ fleet[0] }}</option>
-      {% endfor %}
+      <div class="transportista-option">
+        <label for="transportista"><b><i class="fas fa-id-card icon"></i> Nombre</b> </label>
+        <select id="transportista" name="transportista">
+          {% for name in names %}
+            <option value="{{ name[0] }}">{{ name[0] }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
-    </select>
-    <br><br>
 
-    <label for="lugar">Lugar:</label>
-    <select id="lugar" name="lugar">
-      {% for collection_points_name in collection_points_names %}
-        <option value="{{ collection_points_name[0] }}">{{ collection_points_name[0] }}</option>
-      {% endfor %}
-    </select>
-    <br><br>
+      <div class="transportista-option">
 
-    <h2>2. Selección de Recipientes a Recolectar</h2>
-    <div class="recoleccion-container">
+        <label for="camion"><b><i class="fas fa-truck icon"></i> Placa</b> </label>
+        <select id="camion" name="camion">
+          {% for fleet in fleets %}
+            <option value="{{ fleet[0] }}">{{ fleet[0] }}</option>
+          {% endfor %}
 
-      <label for="tipo_residuo">Tipo de Residuo:</label>
-      <select id="tipo_residuo" name="tipo_residuo[]">
-        {% for trash_type in trash_types %}
-        <option value="{{ trash_type[0] }}">{{ trash_type[0] }}</option>
-        {% endfor %}
-      </select>
-      <br><br>
+        </select>
+      </div>
 
-      <label for="tipo_recipiente_recolectar">Tipo de Recipiente:</label>
-      <select id="tipo_recipiente_recolectar" name="tipo_recipiente_recolectar[]">
-        {% for recipient_type in recipient_types %}
-        <option value="{{ recipient_type[0] }}">{{ recipient_type[0] }}</option>
-        {% endfor %}
-      </select>
-      <br><br>
+      <div class="transportista-option">
 
-      <label for="cantidad_residuos">Cantidad de Residuos (kg):</label>
-      <input type="number" id="cantidad_residuos" name="cantidad_residuos[]">
-      <br><br>
+        <label for="lugar"><b>
+          <i class="fas fa-map-marker-alt icon"></i> Lugar </b> </label>
+        <select id="lugar" name="lugar">
+          {% for collection_points_name in collection_points_names %}
+            <option value="{{ collection_points_name[0] }}">{{ collection_points_name[0] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+
+
     </div>
-    <button type="button" onclick="addRecoleccion()">Agregar Recolección</button>
 
-    <h2>3. Selección de Recipientes a Entregar</h2>
+    <h2><i class="fas fa-trash-alt"></i>
+      Recipientes a Recolectar</h2>
 
-    <div class="entrega-container">
-      <label for="tipo_recipiente_entregar">Tipo de Recipiente:</label>
-      <select id="tipo_recipiente_entregar" name="tipo_recipiente_entregar[]">
-        {% for recipient_type in recipient_types %}
-        <option value="{{ recipient_type[0] }}">{{ recipient_type[0] }}</option>
-        {% endfor %}
-      </select>
-      <br><br>
+    <div class="recollections">
+      <div class="recoleccion-container default" >
 
-      <label for="cantidad_recipientes">Cantidad de Recipientes:</label>
-      <input type="number" id="cantidad_recipientes" name="cantidad_recipientes[]">
-      <br><br>
+        <div class="transportista-option">
+          <label for="tipo_residuo"><i class="fas fa-trash"></i>
+            Residuo </label>
+          <select id="tipo_residuo" name="tipo_residuo[]">
+            {% for trash_type in trash_types %}
+            <option value="{{ trash_type[0] }}">{{ trash_type[0] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="transportista-option">
+          <label for="tipo_recipiente_recolectar"><i class="fas fa-recycle"></i> Recipiente </label>
+          <select id="tipo_recipiente_recolectar" name="tipo_recipiente_recolectar[]">
+            {% for recipient_type in recipient_types %}
+            <option value="{{ recipient_type[0] }}">{{ recipient_type[0] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="transportista-option">
+          <label for="cantidad_residuos">
+            <i class="fas fa-weight"></i>
+             Peso (kg) </label>
+          <input type="text" id="cantidad_residuos" name="cantidad_residuos[]">
+
+        </div>
+
+        <button class="delete-button" type="button" onclick="deleteParent(this)">
+          <i class="fas fa-undo"></i>
+
+        </button>
+      </div>
+      <button type="button" id="addRecoleccionButton" onclick="addRecoleccion()"><i class="fas fa-plus"></i></button>
+
     </div>
-    <button type="button" onclick="addEntrega()">Agregar Entrega</button>
+
+    <h2><i class="fas fa-exchange-alt"></i>
+      Recipientes a Entregar</h2>
+
+    <div class="recollections">
+      <div class="entrega-container default">
+
+        <div class="transportista-option">
+          <label for="tipo_residuo_recolectar"> <i class="fas fa-trash"></i>
+            Residuo </label>
+          <select id="tipo_residuo_recolectar" name="tipo_residuo_recolectar[]">
+            {% for trash_type in trash_types %}
+            <option value="{{ trash_type[0] }}">{{ trash_type[0] }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
 
+        <div class="transportista-option">
+          <label for="tipo_recipiente_entregar"> <i class="fas fa-recycle"></i>
+            Recipiente </label>
+          <select id="tipo_recipiente_entregar" name="tipo_recipiente_entregar[]">
+            {% for recipient_type in recipient_types %}
+            <option value="{{ recipient_type[0] }}">{{ recipient_type[0] }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
-    <h2>4. Confirmar Envío</h2>
-    <input type="submit" value="Enviar">
+
+        <div class="transportista-option">
+          <label for="cantidad_recipientes">
+            <i class="fas fa-boxes"></i>
+            N. Recipientes </label>
+          <input type="text" id="cantidad_recipientes" name="cantidad_recipientes[]">
+        </div>
+
+
+        <button class="delete-button" type="button" onclick="deleteParent(this)">
+          <i class="fas fa-undo"></i>
+        </button>
+
+      </div>
+      <button type="button" id="addEntregaButton" onclick="addEntrega()"><i class="fas fa-plus"></i></button>
+
+    </div>
+
+    <!-- submit button -->
+
+    <button type="submit" class="submit-button">
+      <i class="fas fa-paper-plane"></i>
+      Enviar
+    </button>
+
   </form>
 
 </body>

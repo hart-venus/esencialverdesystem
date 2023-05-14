@@ -518,15 +518,14 @@ CREATE TABLE recipient_status (
 DROP TABLE IF EXISTS recipients;
 CREATE TABLE recipients (
     recipient_id INT NOT NULL IDENTITY(1,1),
-    trash_type_id INT NOT NULL,
     recipient_type_id INT NOT NULL,
     producer_id INT NOT NULL,
+
+    recipient_status_id INT NOT NULL DEFAULT 1,
     PRIMARY KEY (recipient_id),
-    recipient_status_id INT NOT NULL,
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (recipient_type_id) REFERENCES recipient_types(recipient_type_id),
     FOREIGN KEY (recipient_status_id) REFERENCES recipient_status(recipient_status_id),
-    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
@@ -538,9 +537,11 @@ CREATE TABLE recipient_log (
     recipient_status_id INT NOT NULL DEFAULT 1,
     collection_log_id BIGINT NOT NULL,
     movement_type_id INT NOT NULL,
+    trash_type_id INT NOT NULL,
     datetime DATETIME NOT NULL,
     weight DECIMAL(12, 4) NULL,
     PRIMARY KEY (recipient_log_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
     FOREIGN KEY (collection_log_id) REFERENCES collection_log(collection_log_id),
     FOREIGN KEY (recipient_id) REFERENCES recipients(recipient_id),
     FOREIGN KEY (recipient_status_id) REFERENCES recipient_status(recipient_status_id),
