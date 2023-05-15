@@ -94,7 +94,7 @@ label {
     display: flex;
     flex-direction: column;
 
-    width: 860px;
+    width: 760px;
     height: 260px;
     background-color: #ffbb6dd2;
     padding: 20px;
@@ -113,6 +113,33 @@ label {
 }
 .recoleccion-container.visible:hover {
     filter: drop-shadow(0 0 10px #ffd588de);
+}
+
+
+.entrega-container {
+    display: flex;
+    flex-direction: column;
+
+    width: 760px;
+    height: 260px;
+    background-color: #d16dffd2;
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    margin-right: 20px;
+    opacity: 0;
+    transform: translateY(20px); /* Initial position down */
+    transition: 0.5s;
+}
+
+.entrega-container.visible {
+    opacity: 1;
+    transform: translateY(0px); /* Move to final position */
+    transition: 0.5s;
+}
+
+.entrega-container.visible:hover {
+    filter: drop-shadow(0 0 10px #d16dffd2);
 }
 
 h2 {
@@ -165,10 +192,12 @@ h2 {
 
 .recollections > button {
     display: block;
-    width: 900px;
+    width: 800px;
     height: 300px;
     background-color: #ffe4ecb0;
     font-size: 48px;
+    margin-bottom: 20px;
+    margin-right: 20px;
     /* timer for transition */
     transition: 0.15s;
     /* remove borders, round corners */
@@ -194,11 +223,87 @@ h2 {
 .recollections > button:hover {
     filter: drop-shadow(0 0 10px #ff3168c3);
     color: #fff;
+    background-color: #ffe4ecb0;
 }
 
 .recollections > button:hover::before {
     top: 0;
 }
+
+
+
+.submit-button {
+    display: block;
+    margin: 0 auto;
+    padding: 20px;
+    width: 40%;
+    font-size: 32px;
+    font-family: Space Mono, monospace;
+    font-weight: 700;
+    background-color: #31ffb7b0;
+    transition: 0.15s;
+    /* remove borders, round corners */
+    border: none;
+    border-radius: 40px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease
+
+}
+.error {
+    width: 100%;
+    text-align: center;
+    font-family: Space Mono, monospace;
+    background-color: #ff346ac3;
+    transition: 0.3s;
+    font-size: 24px;
+    color: white;
+    padding: 20px;
+    filter: drop-shadow(0 0 5px #ff346ac3);
+}
+
+.success {
+    width: 100%;
+    text-align: center;
+    font-family: Space Mono, monospace;
+    background-color: rgba(5, 39, 36, 0.722);
+    transition: 0.3s;
+    font-size: 24px;
+    color: white;
+    padding: 20px;
+    filter: drop-shadow(0 0 5px rgb(5, 39, 36));
+}
+
+.error:hover {
+    filter: drop-shadow(0 0 10px #ff346ac3);
+}
+
+.success:hover {
+    filter: drop-shadow(0 0 10px rgb(5, 39, 36));
+}
+.submit-button::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 100%;
+    top: 0;
+    background-color: rgba(5, 39, 36, 0.722);
+    transition: right 0.3s ease;
+    z-index: -1;
+}
+
+.submit-button:hover {
+    filter: drop-shadow(0 0 10px rgb(5, 39, 36));
+    color: #fff;
+    background-color: #31ffb7b0;
+}
+
+.submit-button:hover::before {
+    right: 0;
+}
+
+
 .logo img {
     width: 100px;
     /* white glow */
@@ -235,6 +340,7 @@ header {
 
     margin: 20px 0  ;
 }
+
 
 /* For Webkit browsers (Chrome, Safari) */
 ::-webkit-scrollbar {

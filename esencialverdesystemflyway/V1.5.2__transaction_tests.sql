@@ -1,7 +1,7 @@
 DECLARE @name VARCHAR(255);
 DECLARE @plate VARCHAR(255);
 DECLARE @place VARCHAR(255);
-DECLARE @CollectorInfoTVP CollectorInfo;
+DECLARE @CollectorInfoTVP CollectorInfo; --
 DECLARE @RecipientLogTVP RecipientLogInfo;
 DECLARE @type VARCHAR(255);
 DECLARE @weight DECIMAL(12, 4);

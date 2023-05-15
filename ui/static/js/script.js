@@ -25,6 +25,9 @@ function addEntrega() {
     let newEntrega = entregacontainer.cloneNode(true);
     // make the new entrega container visible
     newEntrega.style.display = 'block';
+    setTimeout(function() {
+        newEntrega.classList.add("visible");
+        }, 10);
     // add as a sibling, just before the addEntregaButton
     entregacontainer.parentNode.insertBefore(newEntrega, addEntregaButton);
 }

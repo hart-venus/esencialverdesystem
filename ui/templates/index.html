@@ -24,10 +24,12 @@
 
   {% if error != "" and error != "-1" %}
     <div class="error">
+      <i class="fas fa-times-circle"></i>
       {{ error }}
     </div>
   {% elif error == "-1" %}
     <div class="success">
+      <i class="fas fa-check-circle"></i>
       Se ha registrado la transacción exitosamente
     </div>
   {% endif %}
@@ -115,38 +117,58 @@
 
     </div>
 
-    <h2>3. Selección de Recipientes a Entregar</h2>
+    <h2><i class="fas fa-exchange-alt"></i>
+      Recipientes a Entregar</h2>
 
-    <div class="entrega-container">
+    <div class="recollections">
+      <div class="entrega-container default">
 
-      <label for="tipo_residuo_recolectar">Tipo de Residuo:</label>
-      <select id="tipo_residuo_recolectar" name="tipo_residuo_recolectar[]">
-        {% for trash_type in trash_types %}
-        <option value="{{ trash_type[0] }}">{{ trash_type[0] }}</option>
-        {% endfor %}
-      </select>
-      <br><br>
+        <div class="transportista-option">
+          <label for="tipo_residuo_recolectar"> <i class="fas fa-trash"></i>
+            Residuo </label>
+          <select id="tipo_residuo_recolectar" name="tipo_residuo_recolectar[]">
+            {% for trash_type in trash_types %}
+            <option value="{{ trash_type[0] }}">{{ trash_type[0] }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
-      <label for="tipo_recipiente_entregar">Tipo de Recipiente:</label>
-      <select id="tipo_recipiente_entregar" name="tipo_recipiente_entregar[]">
-        {% for recipient_type in recipient_types %}
-        <option value="{{ recipient_type[0] }}">{{ recipient_type[0] }}</option>
-        {% endfor %}
-      </select>
-      <br><br>
 
-      <label for="cantidad_recipientes">Cantidad de Recipientes:</label>
-      <input type="text" id="cantidad_recipientes" name="cantidad_recipientes[]">
-      <br><br>
-      <button type="button" onclick="deleteParent(this)">Eliminar</button>
+        <div class="transportista-option">
+          <label for="tipo_recipiente_entregar"> <i class="fas fa-recycle"></i>
+            Recipiente </label>
+          <select id="tipo_recipiente_entregar" name="tipo_recipiente_entregar[]">
+            {% for recipient_type in recipient_types %}
+            <option value="{{ recipient_type[0] }}">{{ recipient_type[0] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+
+        <div class="transportista-option">
+          <label for="cantidad_recipientes">
+            <i class="fas fa-boxes"></i>
+            N. Recipientes </label>
+          <input type="text" id="cantidad_recipientes" name="cantidad_recipientes[]">
+        </div>
+
+
+        <button class="delete-button" type="button" onclick="deleteParent(this)">
+          <i class="fas fa-undo"></i>
+        </button>
+
+      </div>
+      <button type="button" id="addEntregaButton" onclick="addEntrega()"><i class="fas fa-plus"></i></button>
 
     </div>
-    <button type="button" id="addEntregaButton" onclick="addEntrega()"><i class="fas fa-plus"></i></button>
 
+    <!-- submit button -->
 
+    <button type="submit" class="submit-button">
+      <i class="fas fa-paper-plane"></i>
+      Enviar
+    </button>
 
-    <h2>4. Confirmar Envío</h2>
-    <input type="submit" value="Enviar">
   </form>
 
 </body>
