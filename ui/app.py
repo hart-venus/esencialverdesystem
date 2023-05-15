@@ -120,17 +120,19 @@ def index():
                 f.write(f"{errorStr}\n")
 
     # Ejecutar las consultas
-    cursor.execute('SELECT full_name FROM people')
+    cursor.execute('EXEC GetPeopleFullNames')
     names = cursor.fetchall()
-    cursor.execute('SELECT plate FROM fleets')
+
+    cursor.execute('EXEC GetFleetsPlates')
     plates = cursor.fetchall()
-    cursor.execute("SELECT name FROM collection_points WHERE is_dropoff = 1 AND active = 1")
+
+    cursor.execute("EXEC GetCollectionPointsNames")
     collection_points_names = cursor.fetchall()
 
-    cursor.execute("SELECT name FROM trash_types")
+    cursor.execute("EXEC GetTrashTypesNames")
     trash_types = cursor.fetchall()
 
-    cursor.execute("SELECT name FROM recipient_types")
+    cursor.execute("EXEC GetRecipientTypesNames")
     recipient_types = cursor.fetchall()
 
     # Cerrar la conexión

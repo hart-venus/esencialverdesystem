@@ -11,6 +11,7 @@
     - [X] FIXME: añadir habilidad de borrar una parte del form
     - [X] Error handling: dar el msj de error al usuario en div
 - [X] Hacer que se vea bonita la pagina
+- [X] No hacer selects en python, hacer stored procedures
 - [ ] Empezar el REST API con NODE (Tomas)
 - [ ] Evaluar con rodri
 - [ ] Si nos da tiempo, hacer puntos extra con ORM (ruby)
