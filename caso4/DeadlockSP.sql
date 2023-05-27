@@ -11,13 +11,13 @@ BEGIN
     BEGIN TRANSACTION;
     
     -- Hacer algo en la transacción 1
-    UPDATE people SET full_name = 'Tomas' WHERE person_id = 1;
+    UPDATE people SET full_name = @name1 WHERE person_id = 1;
 
     -- Esperar un poco para permitir que la transacción 2 se inicie
     WAITFOR DELAY '00:00:05';
 
     -- Intentar acceder a los recursos bloqueados por la transacción 2
-    UPDATE people SET full_name = 'Sven' WHERE person_id = 2;
+    UPDATE people SET full_name = @name2 WHERE person_id = 2;
 
     COMMIT;
 END;
@@ -62,13 +62,13 @@ BEGIN
     BEGIN TRANSACTION;
     
     -- Hacer algo en la transacción 1
-    UPDATE people SET full_name = 'Tomas' WHERE person_id = 2;
+    UPDATE people SET full_name = @name1 WHERE person_id = 2;
 
     -- Esperar un poco para permitir que la transacción 2 se inicie
     WAITFOR DELAY '00:00:05';
 
     -- Intentar acceder a los recursos bloqueados por la transacción 2
-    UPDATE people SET full_name = 'Sven' WHERE person_id = 1;
+    UPDATE people SET full_name = @name2 WHERE person_id = 1;
 
     COMMIT;
 END;
