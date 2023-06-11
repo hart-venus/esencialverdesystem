@@ -14,10 +14,10 @@ n_lpc = 10 # locations per city
 
 # end constants
 
-server = 'localhost'
+server = 'TOMAS-PC'
 database = 'esencialverdesystem'
 username = 'sa'
-password = 'Sven1234'
+password = '1234'
 cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
 
 # people table : full_name
