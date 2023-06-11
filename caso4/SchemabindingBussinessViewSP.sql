@@ -1,3 +1,5 @@
+IF OBJECT_ID('RecyclingView', 'V') IS NOT NULL
+    DROP VIEW RecyclingView;
 
 --Creacion del view
 CREATE VIEW dbo.RecyclingView
@@ -69,5 +71,3 @@ DROP COLUMN payment_date
 ALTER TABLE payments
 ADD payment_date DATETIME NOT NULL
 -----------------------------------
-
-DROP VIEW IF EXISTS dbo.RecyclingView
