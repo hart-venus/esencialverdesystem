@@ -1,0 +1,23 @@
+{
+  "name": "node-api",
+  "version": "1.0.0",
+  "description": "Prueba de conexion implementando un api en REST",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon src/index.js --exec babel-node" 
+  },
+  "author": "Tomas Granados y Ariel Leyva",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.21.5",
+    "@babel/core": "^7.21.8",
+    "@babel/node": "^7.20.7",
+    "@babel/preset-env": "^7.21.5",
+    "nodemon": "^2.0.22"
+  }
+}

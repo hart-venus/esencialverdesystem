@@ -20,14 +20,25 @@ CREATE TABLE producer_parents (
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (producer_parent_id),
 );
+
+-- create countries table
+DROP TABLE IF EXISTS countries;
+CREATE TABLE countries (
+    country_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (country_id)
+);
+
 -- create a producer table with contact_info and producer_parents
 DROP TABLE IF EXISTS producers; -- single establishments like a kfc, mcdonalds, etc
 CREATE TABLE producers (
     producer_id INT NOT NULL IDENTITY(1,1),
     producer_parent_id INT NULL,
+    country_id INT NULL,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (producer_id),
     FOREIGN KEY (producer_parent_id) REFERENCES producer_parents(producer_parent_id),
+    FOREIGN KEY (country_id) REFERENCES countries(country_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
     active BIT NOT NULL DEFAULT 1
@@ -74,6 +85,7 @@ CREATE TABLE products (
     product_id INT NOT NULL IDENTITY(1,1),
     name VARCHAR(255) NOT NULL,
     kg_to_produce DECIMAL(12, 4) NOT NULL,
+
     PRIMARY KEY (product_id),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME NOT NULL DEFAULT GETDATE(),
@@ -128,13 +140,7 @@ CREATE TABLE currencies_dollar_exchange_rate_log (
     PRIMARY KEY (currency_dollar_exchange_rate_log_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
--- create countries table
-DROP TABLE IF EXISTS countries;
-CREATE TABLE countries (
-    country_id INT NOT NULL IDENTITY(1,1),
-    name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (country_id)
-);
+
 
 -- create province table
 DROP TABLE IF EXISTS provinces;
@@ -636,7 +642,9 @@ CREATE TABLE invoices (
     checksum varbinary(64) NOT NULL, -- sha256(sum(values), secret)
     invoice_amount DECIMAL(12, 4) NOT NULL,
     currency_id INT NOT NULL,
+    trash_type_id INT NOT NULL,
     PRIMARY KEY (invoice_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id),
     FOREIGN KEY (producer_id) REFERENCES producers(producer_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id),
 );
@@ -729,12 +737,14 @@ DROP TABLE IF EXISTS product_price_log;
 CREATE TABLE product_price_log (
     product_price_log_id INT NOT NULL IDENTITY(1,1),
     product_id INT NOT NULL,
+    country_id INT NOT NULL,
     price DECIMAL(12, 4) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     checksum varbinary(64) NOT NULL DEFAULT 0x00,
     currency_id INT NOT NULL,
     active BIT NOT NULL DEFAULT 1,
     PRIMARY KEY (product_price_log_id),
+    FOREIGN KEY (country_id) REFERENCES countries(country_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id),
     FOREIGN KEY (currency_id) REFERENCES currencies(currency_id)
 );
@@ -745,9 +755,23 @@ CREATE TABLE sales (
     sale_id INT NOT NULL IDENTITY(1,1),
     product_id INT NOT NULL,
     recycling_contract_id INT NOT NULL,
+    trash_collection_id INT NOT NULL,
     datetime DATETIME NOT NULL DEFAULT GETDATE(),
     PRIMARY KEY (sale_id),
+    FOREIGN KEY (trash_collection_id) REFERENCES trash_collection(trash_collection_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id),
     FOREIGN KEY (recycling_contract_id) REFERENCES recycling_contracts(recycling_contract_id),
+);
+
+-- create a trash_collection table
+DROP TABLE IF EXISTS trash_collection;
+CREATE TABLE trash_collection (
+    trash_collection_id INT NOT NULL IDENTITY(1,1),
+    trash_type_id INT NOT NULL,
+    service_contract_id INT NOT NULL,
+    
+    PRIMARY KEY (trash_collection_id),
+    FOREIGN KEY (service_contract_id) REFERENCES service_contracts(service_contract_id),
+    FOREIGN KEY (trash_type_id) REFERENCES trash_types(trash_type_id)
 );
 

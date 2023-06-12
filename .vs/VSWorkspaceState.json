@@ -1,10 +1,10 @@
 {
   "ExpandedNodes": [
     "",
+    "\\caso4",
     "\\esencialverdesystemflyway",
-    "\\esencialverdesystemflyway\\migrations",
-    "\\preeliminar-3"
+    "\\esencialverdesystemflyway\\migrations"
   ],
-  "SelectedNode": "\\goodgreen.sql",
+  "SelectedNode": "\\caso4\\LostUpdateSP.sql",
   "PreviewInSolutionExplorer": false
 }
